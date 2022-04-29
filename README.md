@@ -1,2 +1,2 @@
 # guide-examples
-Examples for the Kontain guide
+[Examples](/examples/) for the Kontain guide
