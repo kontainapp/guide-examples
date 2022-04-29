@@ -15,5 +15,4 @@ COPY --from=build /opt/src /opt/src
 WORKDIR /opt/src/app
 
 EXPOSE 8080
-ENV KM_MGTPIPE=/tmp/km.sock
 CMD [ "java", "-XX:-UseCompressedOops", "-jar", "/opt/src/app/app.jar" ]
