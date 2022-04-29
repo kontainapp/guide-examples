@@ -10,7 +10,6 @@ COPY target/spring-boot-hello-1.0.jar app.jar
 
 FROM ${OPEN_JDK_KONTAIN_RELEASE_VERSION} as release
 COPY --from=build /opt/src /opt/src
-# COPY --from=build /tmp /tmp
 
 WORKDIR /opt/src/app
 
