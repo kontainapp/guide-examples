@@ -8,6 +8,10 @@ For enabling KVM on Ubuntu 18.04 or higher, you can refer to this [article](http
 Recommended distros are Ubuntu 20.04 and Fedora 32, or newer. Note that this also assumes that your user has access to /dev/kvm.
 
 # Install in Kubernetes
+Please note the pre-requisites above for trying this out on a desktop or Cloud VM.
+
+For example, you can install on Minikube using the instruction below on a desktop that meets the requirements above.
+
 Install Kontain using a Daemonset
 ```bash
 # apply the daemonset
