@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+
+  # build 1
+  app:
+    runtime: krun
+    image: kontainguide/py-flask-hello:1.0
+    ports:
+      - 5000:5000
+    command: |
+      python main.py
+
+    # build:
+    #   context: .
+    #   # build args are obtained from external environment variables
+    #   args:
+    #     - PYTHON_BUILD_IMAGE_VERSION=${PYTHON_BUILD_IMAGE_VERSION}
+    #     - PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=${PYTHON_KONTAIN_RELEASE_IMAGE_VERSION}
+    # environment:
+    #   - ENV=development
+    # env_file: 
+    #   - ../../common/common.env

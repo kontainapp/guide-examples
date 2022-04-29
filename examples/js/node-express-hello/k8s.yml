@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-express-hello
+  labels:
+    app: node-express-hello
+spec:
+  type: ClusterIP 
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: node-express-hello
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-express-hello
+  labels:
+    app: node-express-hello
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-express-hello
+  template:
+    metadata:
+      labels:
+        app: node-express-hello
+    spec:
+      runtimeClassName: kontain
+      containers:
+      - name: node-express-hello
+        image: kontainguide/node-express-hello:1.0
+        ports:
+        - containerPort: 8080

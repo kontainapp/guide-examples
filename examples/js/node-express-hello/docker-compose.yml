@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  demo:
+    runtime: krun
+    image: kontainguide/node-express-hello:1.0
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1
