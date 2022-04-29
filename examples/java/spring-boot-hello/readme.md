@@ -1,22 +1,52 @@
-# ref
-Example from: https://mkyong.com/spring-boot/spring-boot-hello-world-example/
-tar gz from here: https://crunchify.com/maven-assembly-plugin-how-to-create-tar-gz-or-zip-archive-for-java-enterprise-project-using-maven/
-
-# for running in java
+# to build this example
 ```bash
-# run with maven
-$ mvn springboot:run
+$ docker build --build-arg OPEN_JDK_BUILD_VERSION=openjdk:11-jdk-slim-buster --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=kontainapp/runenv-jdk-shell-11.0.8:latest -t kontainguide/spring-boot-hello:1.0 .
+```
 
-# in another terminal
-$ curl localhost:8080
-Hello from Kontain!
+# see image sizes
+```bash
+$ docker images | grep -E 'spring|jdk'
+...
+openjdk                            11-jdk-slim-buster  422MB
+kontainapp/runenv-jdk-shell-11.0.8 latest              179MB
+kontainguide/spring-boot-hello     1.0                 197MB
+...
+```
 
-# to clean, test, package as jar and tar gz bundling (assembly)
-$ mvn clean test package # assembly:assembly
+# to run this example
+```bash
+$ docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-hello kontainguide/spring-boot-hello:1.0
 
-# to run as executable jar
-$ java -jar target/spring-boot-hello-1.0.jar
+# invoke the service
+$ curl -v http://localhost:8080
 
-# in another terminal window
-$ curl http://localhost:8080
-Hello from Kontain!
+$ docker stop spring-boot-hello
+```
+
+# to run this example in docker-compose
+```bash
+$ docker-compose up -d
+
+# invoke the service
+$ curl -v http://localhost:8080
+
+# shut down compose
+$ docker-compose down
+```
+
+# to run this example in kubernetes
+```bash
+$ kubectl apply -f k8s.yml
+
+# check that the pod is ready
+$ kubectl get pods -w
+
+# port-forward the port
+$ kubectl port-forward svc/spring-boot-hello 8080:8080 2>/dev/null &
+
+# invoke the service
+$ curl -vvv http://localhost:8080
+
+# kill the port-forward
+$ pkill -f "port-forward"
+```

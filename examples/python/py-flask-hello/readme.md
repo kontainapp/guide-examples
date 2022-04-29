@@ -1,59 +1,52 @@
-# reference
-Docker python packaging: https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
-For flask From: https://medium.com/analytics-vidhya/build-a-python-flask-app-and-deploy-with-kubernetes-ccc99bbec5dc
-For compose from: https://takacsmark.com/docker-compose-tutorial-beginners-by-example-basics/
-Extended: https://www.python4networkengineers.com/posts/python-intermediate/how_to_run_an_app_with_docker/
-
+# to build this example
 ```bash
-# build and run the container
-$ docker build -t kg/pyflask .
-
-#$ docker build --build-arg BUILD_IMAGE_VERSION=python:3.8-slim --build-arg KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python -t kg/pyflask .
-
-$ docker run --runtime=krun -p 5000:5000 --rm kg/pyflask
-# use Ctrl-\<enter> to exit the container
-
-# run the http curl client in another shell terminal
-$ curl -s -I http://localhost:5000/
-
-# check size of image
-$ docker images
-python-slim........122MB
-python-bullseye....915MB
-
-# note the sizes of the Kontain python runtime image and 
-#     the Python flask server Kontain container image
-runenv-python......23.5MB
-kg/pyflask.........40 MB
+$ docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=python:3.9-slim --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python-3.9:latest -t kontainguide/py-flask-hello:1.0 .
 ```
 
-# Notes
-The Dockerfile here uses a multi-stage docker build (https://pythonspeed.com/articles/multi-stage-docker-python/) for the following benefits:
-
-* this allows us to use the traditional Docker build steps required for Python to install package requirements in a virtual environment as the preferred way to run Python applications
-* allows us to copy over the virtual environment contents
-* allows us to selectively copy over exactly the packaging requrements that Python would need to run the application
-* the image size reduces from over a few hundred MB to about 40MB
-
-# Docker Compose CLI
+# see image sizes
 ```bash
-$ docker-compose build
-$ docker-compose up
-Recreating pyflask_app_1 ... done
-Attaching to pyflask_app_1
-app_1  | python: dlopen: failed to find registration for /opt/venv/lib64/python3.8/site-packages/markupsafe/_speedups.cpython-38-x86_64-linux-gnu.so, check if it was prelinked
-app_1  |  * Serving Flask app 'main' (lazy loading)
-app_1  |  * Environment: production
-app_1  |    WARNING: This is a development server. Do not use it in a production deployment.
-app_1  |    Use a production WSGI server instead.
-app_1  |  * Debug mode: off
-app_1  |  * Running on all addresses.
-app_1  |    WARNING: This is a development server. Do not use it in a production deployment.
-app_1  |  * Running on http://172.18.0.2:5000/ (Press CTRL+C to quit)
-app_1  | 172.18.0.1 - - [02/Nov/2021 01:17:03] "GET / HTTP/1.1" 200 -
+$ docker images|grep python
+kontainapp/runenv-python-3.9 latest               793bfa36a196   2 days ago          24.1MB
+python                       3.8-slim             5ce3cfb9de89   8 days ago          124MB
+python                       3.9-slim             8c7051081f58   8 days ago          125MB
+kontainapp/runenv-python-3.8 v0.9.1               aee035a4b2bc   7 months ago        23.5MB
+```
 
+# to run this example
+```bash
+$ docker run -d --rm -p 5000:5000 --runtime=krun --name py-flask-hello kontainguide/py-flask-hello:1.0
+```
 
-# in another window
-$ curl http://localhost:5000/
-Hello from Kontain!
+# invoke the service
+$ curl -v http://localhost:5000
+
+$ docker stop py-flask-hello
+```
+
+# to run this example in docker-compose
+```bash
+$ docker-compose up -d
+
+# invoke the service
+$ curl -v http://localhost:5000
+
+# shut down compose
+$ docker-compose down
+```
+
+# to run this example kubernetes
+```bash
+$ kubectl apply -f k8s.yml
+
+# check that the pod is ready
+$ kubectl get pods -w
+
+# port-forward the port
+$ kubectl port-forward svc/py-flask-hello 5000:5000 2>/dev/null &
+
+# invoke the service
+$ curl -vvv http://localhost:8080
+
+# kill the port-forward
+$ pkill -f "port-forward"
 ```

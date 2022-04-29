@@ -1,2 +1,2 @@
 # guide-examples
-Examples from the Kontain guide
+Examples for the Kontain guide
