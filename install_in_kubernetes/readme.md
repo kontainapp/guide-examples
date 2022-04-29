@@ -39,7 +39,9 @@ $ kubectl get daemonsets.apps -A
 ```
 
 # To install Kontain on Azure AKS
-The above instructions work well for Azure AKS.
+The above instructions work well for Azure AKS that is run with a minimum instance being Standard_D4s_v3.
+
+This is because this enables nested virtualization by default on that worker node to be able to utilize the power Kontain's virtualization fully.
 
 # To install Kontain on AWS and GKE
 To install Kontain on AWS (with containerd) or GKE use:
