@@ -1,4 +1,5 @@
 #----------------------
+# instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 cloudvmazure:
 	az vm create \
 	--name sm_dev \
@@ -16,6 +17,12 @@ cloudvmaz-list:
 	az vm list --resource-group kdocs -o table
 	az vm list-ip-addresses --resource-group kdocs --name sm_dev -o table
 	az network public-ip list -o table
+#----------------------
+cloudvmaws:
+
+cloudvmaws-clean:
+
+cloudvmaws-list:
 
 #----------------------
 kindcluster:
