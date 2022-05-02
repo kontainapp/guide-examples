@@ -1,4 +1,23 @@
 #----------------------
+cloudvmazure:
+	az vm create \
+	--name sm_dev \
+	--resource-group kdocs \
+	--size Standard_D4_v3 \
+	--image UbuntuLTS \
+	--ssh-key-name sm-key \
+	--admin-username azure-user \
+	--custom-data ./ubuntu_cloud_init.sh
+
+cloudvmazure-clean:
+	az vm delete --resource-group kdocs --name sm_dev --yes
+
+cloudvmaz-list:
+	az vm list --resource-group kdocs -o table
+	az vm list-ip-addresses --resource-group kdocs --name sm_dev -o table
+	az network public-ip list -o table
+
+#----------------------
 kindcluster:
 	echo
 	echo "creating kind cluster: kind-kind"
