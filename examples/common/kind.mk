@@ -51,7 +51,9 @@ kindcluster-apply-km:
 	echo "saving log output of kontain-node-initiliazer daemonset pod"
 	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-kind.log
 
-	sleep 5
+	sleep 20
+	kubectl get po -A
+	cat /tmp/kontain-node-initializer-kind.log	
 
 
 kindcluster-clean:
