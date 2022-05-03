@@ -42,8 +42,8 @@ sudo apt update -y
 
 # install git and python pyenv dependencies
 echo "installing git, other dependencies"
-sudo apt install -y git zip unzip wget jq
-sudo apt-get -y install git python-pip make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
+sudo apt install -y make git zip unzip wget jq
+sudo apt-get -y install python-pip make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
 
 # install docker
 echo "installing Docker CE"
@@ -70,6 +70,11 @@ sudo systemctl start docker.service
 # enable and start docker daemon
 echo "service enable and start docker"
 sudo systemctl enable --now docker
+
+# compose
+echo "installing docker-compose"
+sudo curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
 # install node
 echo "installing node"
@@ -170,3 +175,6 @@ sudo chmod +x /usr/local/bin/docker-image-extract
 # install kontain
 sudo mkdir -p /opt/kontain ; sudo chown root /opt/kontain
 curl -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/kontain-install.sh | sudo bash
+
+# clone Kontain examples
+git clone https://github.com/kontainapp/guide-examples.git

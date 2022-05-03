@@ -2,16 +2,16 @@
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 cloudvmazure:
 	az vm create \
-	--name sm_dev \
+	--name sm_dev1 \
 	--resource-group kdocs \
-	--size Standard_D4_v3 \
-	--image UbuntuLTS \
+	--size Standard_D4s_v3 \
+	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
 	--ssh-key-name sm-key \
 	--admin-username azure-user \
 	--custom-data ./ubuntu_cloud_init.sh
 
 cloudvmazure-clean:
-	az vm delete --resource-group kdocs --name sm_dev --yes
+	az vm delete --resource-group kdocs --name sm_dev1 --yes
 
 cloudvmaz-list:
 	az vm list --resource-group kdocs -o table
