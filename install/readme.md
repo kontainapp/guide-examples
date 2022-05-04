@@ -26,7 +26,7 @@ $ systemctl|grep docker.service
   docker.service
   ```
 
-  *Note*: If Docker is not present, you can install Docker On Fedora/RHEL systems using instructions from here or for Ubuntu using these instructions.
+  *Note*: If Docker is not present, you can install Docker On Fedora/RHEL systems using (instructions from here)[https://docs.docker.com/engine/install/fedora/] or for Ubuntu using (these instructions)[https://docs.docker.com/engine/install/ubuntu/].
 
 # Install Kontain
 ```bash
