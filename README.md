@@ -11,4 +11,4 @@ Kontain is a new secure runtime for Docker and Kubernetes that provides:
 [Install Kontain on Ubuntu 20.04 or later or Fedora 34 or Amazon Linux 2 with Kernel 5.10](/install/)
 
 # In Kubernetes
-[Installing Kontain in Kubernetes](/install_in_kubernetes/)
+[Installing Kontain in Kubernetes (Regular or AKS, EKS, GKE) ](/install_in_kubernetes/)
