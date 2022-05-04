@@ -16,7 +16,7 @@ $ uname -r
 
 # verify that you have nested virtualization turned on
 $ cat /proc/cpuinfo| egrep "vmx|svm" | wc -l
-# output must be greater than 0
+# output must be atleast 1 or greater
 
 # verify that you have KVM already installed /dev/kvm enabled by checking:
 $ ls -l /dev/kvm
