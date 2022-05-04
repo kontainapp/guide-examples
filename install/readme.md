@@ -38,5 +38,10 @@ $ ls -l /opt/kontain
 ```
 
 # Verify if Kontain can run after install
+```bash
+# check if Kontain monitor can run the unikernel
 $ /opt/kontain/bin/km /opt/kontain/tests/hello_test.km
+
+# check with docker can run with kontain as runtime
+$ docker run --runtime=krun kontainguide/hello-kontain
 ```
