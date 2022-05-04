@@ -86,3 +86,9 @@ gkecluster-up:
 
 gkecluster-clean:
 	make -C common -f kind.mk gkecluster-clean
+
+ekscluster-up:
+	make -C common -f kind.mk ekscluster ekscluster-apply-kkm
+
+ekscluster-clean:
+	make -C common -f kind.mk ekscluster-clean

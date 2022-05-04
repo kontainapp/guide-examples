@@ -235,13 +235,13 @@ gkecluster-clean:
 #--------------
 # EKS Cluster
 #--------------
-ekscluster-setup:
+ekscluster:
 	# 1-time task as it takes way too long to create a k8s cluster from scratch in cloudformation (sets up private subnet etc.)
-	echo "setting up 1-node EKS cluster - kdocscluster-eks-2 - using t2.small instance type"
-	eksctl create cluster -f aws/kdocscluster-eks-2.yaml
+	echo "setting up 1-node EKS cluster - kdocscluster-eks-2 - using t2.medium instance type"
+	eksctl create cluster -f conf/aws_eksctl.conf
 	# eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-west-2 --cluster=kdocscluster-eks
 
-ekscluster:
+ekscluster-add-ng:
 	echo "setting up nodegroup for a 1-node EKS cluster - kdocscluster-eks-2 - using t2.small instance type"
 
 	# it takes too long to create a cluster with the huge cloudformation stack generated, hence we will just add a nodegroup
@@ -258,8 +258,8 @@ ekscluster:
 ekscluster-apply-kkm:
 	echo "applying kkm to kind cluster: kdocscluster-eks-2"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f kustomize_outputs/kkm.yaml
-	sleep 5
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
+	sleep 15
 
 	echo "waiting for kontain-node-initializer to be running and applying KKM"
 	kubectl -n kube-system wait pod --for=condition=Ready -l name=kontain-node-initializer --timeout=420s
@@ -269,6 +269,8 @@ ekscluster-apply-kkm:
 	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-eks.log
 
 	sleep 5
+	echo "showing output of node-initializer log"
+	cat /tmp/kontain-node-initializer-gke.log
 
 ekscluster-apply-flaskapp:
 	echo "deploying kontain flask app to cluster: kdocscluster-eks-2"
@@ -288,7 +290,7 @@ ekscluster-apply-flaskapp:
 	echo "getting pods in default NS"
 	kubectl get po
 
-ekscluster-clean:
+ekscluster-drain-ng:
 	# takes too long to rebuild cluster hence not doing $ eksctl delete cluster --region=us-west-2 --name=kdocscluster-eks
 	# we will just remove the node group, and scale it down to 0 to remove the nodes, ignore the pod disruption budgets
 	echo "removing kontain-node-initializer"
@@ -303,3 +305,6 @@ ekscluster-clean:
 	eksctl delete nodegroup  --config-file=conf/aws/kdocscluster-eks-2.yaml --approve
 
 	- kubectl config delete-context "kdocscluster-eks-2"
+
+ekscluster-clean:
+	eksctl delete cluster --name EKS
