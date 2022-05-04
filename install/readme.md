@@ -26,11 +26,28 @@ $ systemctl|grep docker.service
   docker.service
   ```
 
-*Note*: If Docker is not present, you can install Docker On:
+# Ensuring that Docker is installed
+If Docker is not present, you can install Docker On:
 * Fedora/RHEL systems using [instructions from here](https://docs.docker.com/engine/install/fedora/) 
 * or for Ubuntu using [these instructions](https://docs.docker.com/engine/install/ubuntu/)
 * Also please use [these instructions](https://docs.docker.com/engine/install/linux-postinstall/) for the ability to run Docker without using 'sudo'
 
+
+# Update your OS
+For Fedora:
+```bash
+$ sudo dnf update -y
+```
+
+For Ubuntu Focal:
+```bash
+$ sudo apt update -y
+```
+
+For Amazon Linux 2:
+```bash
+$ sudo yum update -y
+```
 
 # Install Kontain
 ```bash
@@ -49,6 +66,6 @@ $ ls -l /opt/kontain
 # check if Kontain monitor can run the unikernel
 $ /opt/kontain/bin/km /opt/kontain/tests/hello_test.km
 
-# check with docker can run with kontain as runtime
+# check if docker can run with kontain as runtime
 $ docker run --runtime=krun kontainguide/hello-kontain
 ```
