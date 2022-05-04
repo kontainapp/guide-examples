@@ -1,5 +1,8 @@
 # Pre-requisites
-Kontain runs on Linux kernel version 4.15 or newer, running on Intel VT (vmx) or AMD (svm) with KVM based virtualization enabled, ideally Ubuntu or Fedora. For enabling KVM on Ubuntu 18.04 or higher, you can refer to this article.
+Kontain runs on Linux kernel version 4.15 or newer, running on Intel VT (vmx) or AMD (svm) with KVM based virtualization enabled, ideally:
+* Ubuntu 20.04 or higher, or 
+* Fedora 34 or higher
+* Amazon Linux 2 VM with kernel version 5.10 or higher
 
 Recommended distros are Ubuntu 20.04 and Fedora 32, or newer. Note that this also assumes that your user has access to /dev/kvm.
 
