@@ -106,8 +106,7 @@ minikubecluster-apply-km:
 akscluster:
 	echo "setting up 1-node AKS cluster - kdocscluster-aks - using Dsv3 instance type"
 	# az aks create -g kdocs -n "kdocscluster-aks" --enable-managed-identity --node-count 1 --generate-ssh-keys --node-vm-size Standard_D4s_v3
-	# --ssh-key-value ~/.ssh/id_rsa.pub
-	az aks create -g kdocs -n "kdocscluster-aks" --enable-managed-identity --node-count 1  --node-vm-size Standard_D4s_v3
+	az aks create -g kdocs -n "kdocscluster-aks" --enable-managed-identity --node-count 1 --ssh-key-value ${HOME}/.ssh/id_rsa.pub --node-vm-size Standard_D4s_v3
 
 	# setup kubectl and its context
 	az aks get-credentials --resource-group kdocs --name "kdocscluster-aks"
@@ -122,17 +121,22 @@ akscluster:
 akscluster-apply-km:
 	echo "applying km to kind cluster: kdocscluster-aks"
 	# kubectl apply -f kustomize_outputs/km.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f kustomize_outputs/km.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km.yaml
 	sleep 5
 
 	echo "waiting for kontain-node-initializer to be ready"
 	kubectl -n kube-system wait pod --for=condition=Ready -l name=kontain-node-initializer --timeout=240s
 
-	sleep 5
+	sleep 10
 	echo "saving log output of kontain-node-initiliazer daemonset pod"
 	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-aks.log
 
-	sleep 5
+	sleep 10
+	echo "showing output of node-initializer log"
+	cat /tmp/kontain-node-initializer-aks.log
+
+	sleep 10
+
 
 akscluster-apply-flaskapp:
 	echo "deploying kontain flask app to cluster: kdocscluster-aks"
@@ -186,12 +190,12 @@ gkecluster:
 
 	echo "waiting for all pods to be ready before cluster can be used"
 	kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=720s
-	sleep 10
+	sleep 15
 
 gkecluster-apply-kkm:
 	echo "applying kkm to kind cluster: kdocscluster-gke"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f kustomize_outputs/kkm.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
 	sleep 5
 
 	echo "waiting for kontain-node-initializer to be running and applying KKM"
@@ -201,7 +205,9 @@ gkecluster-apply-kkm:
 	echo "saving log output of kontain-node-initiliazer daemonset pod"
 	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-gke.log
 
-	sleep 5
+	sleep 15
+	echo "showing output of node-initializer log"
+	cat /tmp/kontain-node-initializer-gke.log
 
 gkecluster-apply-flaskapp:
 	echo "deploying kontain flask app to cluster: kdocscluster-gke"
@@ -212,7 +218,7 @@ gkecluster-apply-flaskapp:
 
 	echo "deploying the Kontain flask app"
 	# kubectl apply -f apps/pyflaskappkontain.yml && kubectl rollout status deployment/flaskappkontain --timeout=60s
-	kubectl apply -f apps/pyflaskappkontain.yml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
 	sleep 3
 
 	echo "waiting for flask app to be ready"

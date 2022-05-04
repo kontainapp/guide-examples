@@ -68,9 +68,21 @@ testk8sjs:
 testk8spython:
 	make -C python/py-flask-hello testk8s
 
-kindcluster:
+kindcluster-up:
 	make -C common -f kind.mk kindcluster kindcluster-apply-km
 	sleep 20
 
 kindcluster-clean:
 	make -C common -f kind.mk kindcluster-clean
+
+akscluster-up:
+	make -C common -f kind.mk akscluster akscluster-apply-km
+
+akscluster-clean:
+	make -C common -f kind.mk akscluster-clean
+
+gkecluster-up:
+	make -C common -f kind.mk gkecluster gkecluster-apply-kkm
+
+gkecluster-clean:
+	make -C common -f kind.mk gkecluster-clean
