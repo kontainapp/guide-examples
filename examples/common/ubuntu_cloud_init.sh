@@ -84,11 +84,19 @@ sudo apt install nodejs -y
 echo "installing go"
 sudo apt install golang-go
 
+cat<<EOF >> /home/azure-user/.bash_profile
+export GOPATH='/home/azure-user/go'
+export GOROOT='/usr/local/go'
+export PATH="$PATH:/usr/local/bin:$GOROOT/bin:$GOPATH/bin"
+export GO111MODULE="on"
+export GOSUMDB=off
+EOF
+
 # update for installing python using pyenv
 sudo apt-get install -y git python-pip make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
 
 # install JDK 11
-sudo apt install -y openjdk-11-jre-headless
+sudo apt install -y openjdk-11-jdk maven
 
 # install python3
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -111,6 +119,9 @@ echo "installing AWS CLI"
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
+
+# prevent paging with commands
+aws configure set cli_pager ""
 
 # install azure cloud CLI
 echo "installing Azure CLI"

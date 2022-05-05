@@ -2,7 +2,7 @@
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 # Azure VM
 #----------------------
-cloudvmazure:
+cloudvmazure-up:
 	az vm create \
 	--name sm_dev1 \
 	--resource-group kdocs \
@@ -22,11 +22,43 @@ cloudvmaz-list:
 #----------------------
 # AWS VM
 #----------------------
-cloudvmaws:
-
+cloudvmaws-up:
+	export AWS_PAGER=""
+	aws ec2 run-instances \
+	--image-id ami-0022f774911c1d690 \
+	--security-group-ids sg-0b8cf89d293b7adfc \
+	--instance-type t3.medium \
+	--key-name sm-key \
+	--count 1 \
+	--no-paginate \
+	--tag-specifications 'ResourceType=instance,Tags=[{Key=usage,Value=guide-examples}]' 'ResourceType=volume,Tags=[{Key=usage,Value=guide-examples}]' \
+	--user-data file://amzn2_linux_cloud_init.sh
+	sleep 20
+	
 cloudvmaws-clean:
+	# prevents pagin with aws commands
+	export AWS_PAGER=""
+	aws ec2 terminate-instances --instance-ids `aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --filters "Name=tag:usage,Values=guide-examples" --output text`
+	sleep 20
 
 cloudvmaws-list:
+	export AWS_PAGER=""
+	aws ec2 describe-instances \
+		--query 'Reservations[].Instances[].InstanceId' \
+		--filters "Name=tag:usage,Values=guide-examples" \
+		--output text
+	# get the ip addresses
+	aws ec2 describe-instances \
+		--query "Reservations[].Instances[][PublicIpAddress]" \
+		--filters "Name=tag:usage,Values=guide-examples" \
+		--output text | grep -v "None"
+
+cloudvmaws-ssh:
+	# works well when there's only 1 instance running
+	ssh ec2-user@`aws ec2 describe-instances \
+		--query "Reservations[].Instances[][PublicIpAddress]" \
+		--filters "Name=tag:usage,Values=guide-examples" \
+		--output text | grep -v "None"`
 
 #----------------------
 # kind cluster
