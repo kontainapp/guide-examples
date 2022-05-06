@@ -10,7 +10,7 @@ cloudvmazure-up:
 	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
 	--ssh-key-name sm-key \
 	--admin-username azure-user \
-	--custom-data ./ubuntu_cloud_init.sh
+	--custom-data ./ubuntu_kvm_cloud_init.sh
 
 cloudvmazure-clean:
 	az vm delete --resource-group kdocs --name sm_dev1 --yes
@@ -33,13 +33,13 @@ cloudvmaws-up:
 	--no-paginate \
 	--tag-specifications 'ResourceType=instance,Tags=[{Key=usage,Value=guide-examples}]' 'ResourceType=volume,Tags=[{Key=usage,Value=guide-examples}]' \
 	--user-data file://amzn2_linux_cloud_init.sh
-	sleep 20
+	sleep 10
 	
 cloudvmaws-clean:
 	# prevents pagin with aws commands
 	export AWS_PAGER=""
 	aws ec2 terminate-instances --instance-ids `aws ec2 describe-instances --query 'Reservations[].Instances[].InstanceId' --filters "Name=tag:usage,Values=guide-examples" --output text`
-	sleep 20
+	sleep 10
 
 cloudvmaws-list:
 	export AWS_PAGER=""
