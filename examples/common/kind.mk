@@ -33,7 +33,7 @@ cloudvmaws-up:
 	--no-paginate \
 	--tag-specifications 'ResourceType=instance,Tags=[{Key=usage,Value=guide-examples}]' 'ResourceType=volume,Tags=[{Key=usage,Value=guide-examples}]' \
 	--user-data file://amzn2_linux_cloud_init.sh
-	sleep 10
+	sleep 20
 	
 cloudvmaws-clean:
 	# prevents pagin with aws commands

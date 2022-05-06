@@ -77,26 +77,6 @@ mv bin/docker_config.sh /opt/kontain/bin/
 # systemctl restart --no-block docker
 bash /opt/kontain/bin/docker_config.sh
 
-
-# installing JDK
-echo "installing JDK 11"
-# NOTE - cant use amazon-linux-extras as they default to openjdk-17 or yum - as it installs older version fo maven - HAVE TO USE SDKMAN
-cat <<EOF | sudo tee /tmp/install_sdkman.sh
-# install java
-cd /home/ec2-user
-echo "installing sdkman and java"
-curl -s "https://get.sdkman.io" | bash
-echo 'source "/home/ec2-user/.sdkman/bin/sdkman-init.sh"' | tee -a /home/ec2-user/.bash_profile
-
-# install java and maven using sdkman
-# have to do this as the sdkman script has unbounded variable or something
-set +u
-source "/home/ec2-user/.sdkman/bin/sdkman-init.sh" && sdk install java 11.0.11.hs-adpt && sdk install maven
-EOF
-
-sudo chmod +x /tmp/install_sdkman.sh
-sudo runuser  -l ec2-user -c /tmp/install_sdkman.sh
-
 # installing nodejs
 echo "installing nodejs"
 cd /tmp
@@ -116,10 +96,9 @@ sudo mkdir -p /home/ec2-user/go/bin
 sudo yum install -y golang
 
 cat<<EOF >> /home/ec2-user/.bash_profile
-export GOPATH='/home/ec2-user/go'
-export GOROOT='/usr/local/go'
-export PATH="$PATH:/usr/local/bin:$GOROOT/bin:$GOPATH/bin"
-export GO111MODULE="on"
+export GOPATH="/home/ec2-user/go"
+export GOROOT="/usr/local/go"
+export PATH="\$PATH:/usr/local/bin:\$GOROOT/bin:\$GOPATH/bin"
 export GOSUMDB=off
 EOF
 
@@ -140,11 +119,24 @@ eval "\$(pyenv init -)"
 eval "\$(pyenv virtualenv-init -)"
 EOF
 
-
-
 sudo runuser -l ec2-user -c echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bash_profile
 sudo runuser -l ec2-user -c echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
 sudo runuser -l ec2-user -c echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
+
+# installing JDK
+echo "installing JDK 11"
+# NOTE - cant use amazon-linux-extras as they default to openjdk-17 or yum - as it installs older version fo maven - HAVE TO USE SDKMAN
+echo "installing sdkman and java"
+
+sudo runuser  -l ec2-user -c 'curl -s "https://get.sdkman.io" | bash'
+sudo runuser  -l ec2-user -c 'source /home/ec2-user/.sdkman/bin/sdkman-init.sh && sdk install java 11.0.11.hs-adpt && sdk install maven'
+sudo runuser -l ec2-user -c ''
+cat <<EOF  >> /home/ec2-user/.bash_profile
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="\$HOME/.sdkman"
+[[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
+EOF
+
 
 #install minikube so we have kubernetes testing
 echo "installing minikube"
