@@ -1,5 +1,6 @@
 #!/bin/sh
-set -xe
+set -x
+$VM_USER=azure-user
 
 echo "this has been written via cloud-init" + $(date) >> /tmp/myScript.txt
 echo "write install script for java sdkman and python pyenv"
@@ -11,11 +12,14 @@ sudo lscpu | grep Virtualization
 mkdir -p /home/azure-user
 touch /home/azure-user/.bash_profile
 
+chmod +x /home/azure-user/install_java_py.sh
+
 sudo apt update -y
 
 # install git and python pyenv dependencies
 echo "installing git, other dependencies"
-sudo apt install -y make git zip unzip wget jq curl
+sudo apt install -y make git zip unzip wget jq
+sudo apt-get -y install python-pip make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
 
 # install docker
 echo "installing Docker CE"
@@ -54,7 +58,7 @@ sudo apt install nodejs -y
 
 # install golang
 echo "installing go"
-sudo apt install -y golang-go
+sudo apt install golang-go
 
 cat<<EOF >> /home/azure-user/.bash_profile
 export GOPATH='/home/azure-user/go'
@@ -63,6 +67,9 @@ export PATH="$PATH:/usr/local/bin:$GOROOT/bin:$GOPATH/bin"
 export GO111MODULE="on"
 export GOSUMDB=off
 EOF
+
+# update for installing python using pyenv
+sudo apt-get install -y git build-essential makepython-pip make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl
 
 #----------------------------------------
 # using sdkman and pyenv since we will need to keep switching versions for testing
@@ -78,14 +85,12 @@ EOF
 # installing python using pyenv as yum breaks when using yum and update-alternatives
 echo "installing Python 3.9"
 # install dependencies
-sudo apt install -y make build-essential libssl-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
-    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+sudo apt-get install -y gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel
 
 # ref: https://www.singlestoneconsulting.com/blog/setting-up-your-python-environment/
 sudo runuser -l azure-user -c "curl https://pyenv.run | bash"
-sudo runuser -l azure-user -c "/home/azure-user/.pyenv/bin/pyenv install 3.9.12"
-sudo runuser -l azure-user -c "/home/azure-user/.pyenv/bin/pyenv global 3.9.12"
+sudo runuser -l azure-user -c "~/.pyenv/bin/pyenv install 3.9.12"
+sudo runuser -l azure-user -c "~/.pyenv/bin/pyenv global 3.9.12"
 
 cat<<EOF >> /home/azure-user/.bash_profile
 export PATH="\$HOME/.pyenv/bin:$PATH"
@@ -93,9 +98,9 @@ eval "\$(pyenv init -)"
 eval "\$(pyenv virtualenv-init -)"
 EOF
 
-sudo runuser -l azure-user -c echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> /home/azure-user/.bash_profile
-sudo runuser -l azure-user -c echo 'eval "$(pyenv init -)"' >> /home/azure-user/.bash_profile
-sudo runuser -l azure-user -c echo 'eval "$(pyenv virtualenv-init -)"' >> /home/azure-user/.bash_profile
+sudo runuser -l azure-user -c echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bash_profile
+sudo runuser -l azure-user -c echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
+sudo runuser -l azure-user -c echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
 
 # installing JDK
 echo "installing JDK 11"
@@ -104,7 +109,7 @@ echo "installing sdkman and java"
 
 sudo runuser  -l azure-user -c 'curl -s "https://get.sdkman.io" | bash'
 sudo runuser  -l azure-user -c 'source /home/azure-user/.sdkman/bin/sdkman-init.sh && sdk install java 11.0.11.hs-adpt && sdk install maven'
-sudo runuser  -l azure-user -c ''
+sudo runuser -l azure-user -c ''
 cat <<EOF  >> /home/azure-user/.bash_profile
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="\$HOME/.sdkman"
@@ -124,20 +129,29 @@ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/
 
+# install aws cli
+echo "installing AWS CLI"
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# prevent paging with commands
+aws configure set cli_pager ""
+
 # install azure cloud CLI
 echo "installing Azure CLI"
-sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
+sudo apt-get install ca-certificates curl apt-transport-https lsb-release gnupg
 curl -sL https://packages.microsoft.com/keys/microsoft.asc |
     gpg --dearmor |
     sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
 AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
     sudo tee /etc/apt/sources.list.d/azure-cli.list
-sudo apt-get update -y
-sudo apt-get install -y azure-cli
+sudo apt-get update
+sudo apt-get install azure-cli
 
 # utilities
-# install kubectl
+# install kubectl and gcloud-cli
 echo "installing kubectl"
 sudo apt-get install -y apt-transport-https ca-certificates curl
 sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -145,10 +159,26 @@ echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https:/
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 
-sudo apt-get update -y && sudo apt-get install -y kubectl
+sudo apt-get update -y && sudo apt-get install -y kubectl google-cloud-cli
 
 # grype for vulnerabilities
 curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+# eksctl
+sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+eksctl version
+
+# ecs-cli
+sudo curl -Lo /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
+
+# terraform
+sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+sudo apt-get update && sudo apt-get install terraform
+
+terraform -help
 
 # k3d
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash

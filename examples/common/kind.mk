@@ -2,23 +2,36 @@
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 # Azure VM
 #----------------------
+clouddevvmazure-up:
+	az vm create \
+	--name sm_dev2 \
+	--resource-group kdocs \
+	--size Standard_D4s_v3 \
+	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
+	--ssh-key-name sm-key \
+	--admin-username azure-user \
+	--custom-data ./cloud-init/ubuntu_kvm_devvm_init.sh
+
 cloudvmazure-up:
 	az vm create \
-	--name sm_dev1 \
+	--name trial_vm1 \
 	--resource-group kdocs \
 	--size Standard_D4s_v3 \
 	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
 	--ssh-key-name sm-key \
 	--admin-username azure-user \
 	--custom-data ./cloud-init/ubuntu_kvm_cloud_init.sh
+	sleep 20
 
 cloudvmazure-clean:
-	az vm delete --resource-group kdocs --name sm_dev1 --yes
+	az vm delete --resource-group kdocs --name trial_vm1 --yes
+	sleep 10
 
-cloudvmaz-list:
+cloudvmazure-list:
 	az vm list --resource-group kdocs -o table
 	az vm list-ip-addresses --resource-group kdocs --name sm_dev -o table
 	az network public-ip list -o table
+
 #----------------------
 # AWS VM
 #----------------------
