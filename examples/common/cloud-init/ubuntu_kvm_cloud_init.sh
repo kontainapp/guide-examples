@@ -15,7 +15,7 @@ sudo apt update -y
 
 # install git and python pyenv dependencies
 echo "installing git, other dependencies"
-sudo apt install -y make git zip unzip wget jq curl
+sudo apt install -y make gcc g++ git zip unzip wget jq curl
 
 # install docker
 echo "installing Docker CE"
@@ -49,7 +49,11 @@ sudo curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 # install node
-echo "installing node"
+echo "installing node 12 or above"
+sudo apt -y install curl dirmngr apt-transport-https lsb-release ca-certificates
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+sudo apt -y install nodejs
+
 sudo apt install nodejs -y
 
 # install golang
@@ -112,6 +116,9 @@ export SDKMAN_DIR="\$HOME/.sdkman"
 EOF
 
 #----------------------------------------
+# install kustomize
+sudo curl -Lo /usr/local/bin/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v3.2.3/kustomize_kustomize.v3.2.3_linux_amd64
+sudo chmod +x /usr/local/bin/kustomize
 
 # install minikube
 echo "installing minikube"

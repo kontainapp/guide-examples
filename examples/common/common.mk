@@ -75,6 +75,20 @@ cloudvmaws-ssh:
 		--output text | grep -v "None"`
 
 #----------------------
+# AWS VM
+#----------------------
+build-overlays:
+	mkdir -p ./kustomize_outputs/
+
+	echo "building overlays for km, kkm, km-crio, k3s"
+	# to apply directly, use:
+	# 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km/cloud/k8s/deploy/kontain-deploy/base?ref=sm/try-v0.9.8" | kubectl apply -f -
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/base?ref=sm/try-v0.9.8" > ./kustomize_outputs/km.yaml
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/km-crio?ref=sm/try-v0.9.8" > ./kustomize_outputs/km-crio.yaml
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/try-v0.9.8" > ./kustomize_outputs/kkm.yaml
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/k3s?ref=sm/try-v0.9.8" > ./kustomize_outputs/k3s.yaml
+
+#----------------------
 # kind cluster
 #----------------------
 kindcluster:
@@ -92,7 +106,7 @@ kindcluster:
 kindcluster-apply-km:
 	echo
 	echo "applying km to kind cluster: kind-kind"
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km.yaml
+	kubectl apply -f ./kustomize_outputs/km.yaml
 
 	sleep 5
 
@@ -133,7 +147,7 @@ minikubecluster-clean:
 minikubecluster-apply-km:
 	echo
 	echo "applying km to minikube cluster: minikube"
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km.yaml
+	kubectl apply -f ./kustomize_outputs/km.yaml
 
 	sleep 5
 
@@ -167,7 +181,7 @@ akscluster:
 akscluster-apply-km:
 	echo "applying km to kind cluster: kdocscluster-aks"
 	# kubectl apply -f kustomize_outputs/km.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km.yaml
+	kubectl apply -f ./kustomize_outputs/km.yaml
 	sleep 5
 
 	echo "waiting for kontain-node-initializer to be ready"
@@ -264,7 +278,7 @@ gkecluster-apply-flaskapp:
 
 	echo "deploying the Kontain flask app"
 	# kubectl apply -f apps/pyflaskappkontain.yml && kubectl rollout status deployment/flaskappkontain --timeout=60s
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
+	kubectl apply -f./kustomize_outputs/kkm.yaml
 	sleep 3
 
 	echo "waiting for flask app to be ready"
@@ -304,7 +318,7 @@ ekscluster-add-ng:
 ekscluster-apply-kkm:
 	echo "applying kkm to kind cluster: kdocscluster-eks-2"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
+	kubectl apply -f ./kustomize_outputs/kkm.yaml
 	sleep 15
 
 	echo "waiting for kontain-node-initializer to be running and applying KKM"

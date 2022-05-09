@@ -137,6 +137,10 @@ export SDKMAN_DIR="\$HOME/.sdkman"
 [[ -s "\$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "\$HOME/.sdkman/bin/sdkman-init.sh"
 EOF
 
+# install kustomize
+sudo curl -Lo /usr/local/bin/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v3.2.3/kustomize_kustomize.v3.2.3_linux_amd64
+sudo chmod +x /usr/local/bin/kustomize
+
 
 #install minikube so we have kubernetes testing
 echo "installing minikube"
