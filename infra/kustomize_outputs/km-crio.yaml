@@ -1,0 +1,149 @@
+apiVersion: v1
+data:
+  entrypoint.sh: |-
+    #!/usr/bin/env bash
+
+    set -x
+    set -euo pipefail
+
+    ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
+
+    source /scripts-lib/kontain_install_lib.sh
+    install_kontain_artifacts
+
+    echo "Install Kontain Runtime Artifacts (KM & KRUN)"
+
+    echo "Add Kontain Runtime to CRIO configuration"
+    cat <<-EOT | tee -a /etc/crio/crio.conf.d/99-kontain-deploy
+      [crio.runtime.runtimes.krun]
+      runtime_path = "/opt/kontain/bin/krun"
+      runtime_type = "oci"
+      runtime_root = "/run/krun"
+    EOT
+
+    [ -c /root/dev/kvm ] && chmod 666 /root/dev/kvm
+
+    echo "restart crio"
+    systemctl daemon-reload
+    systemctl restart crio
+
+    sleep infinity
+kind: ConfigMap
+metadata:
+  labels:
+    app: kontain-init
+  name: kontain-install-entrypoint
+  namespace: kube-system
+---
+apiVersion: v1
+data:
+  kontain_install_lib.sh: |-
+    #!/usr/bin/env bash
+
+    # This will get overridden be ENV definition in kontain-deploy.yaml
+    KONTAIN_RELEASE_URL="${KONTAIN_RELEASE_URL:-https://github.com/kontainapp/km/releases/download/latest/kontain_bin.tar.gz}"
+
+    function install_kontain_artifacts() {
+      echo "Install Kontain Runtime Artifacts (KM & KRUN)"
+      mkdir /kontain-artifacts
+      curl -L "${KONTAIN_RELEASE_URL}" | tar -xzf - -C /kontain-artifacts
+      mkdir -p /root/opt/kontain/bin
+      cp /kontain-artifacts/km/km /root/opt/kontain/bin/km
+      chmod +x /root/opt/kontain/bin/km
+      cp /kontain-artifacts/container-runtime/krun /root/opt/kontain/bin/krun
+      chmod +x /root/opt/kontain/bin/krun
+      mkdir -p /root/opt/kontain/shim
+      cp /kontain-artifacts/cloud/k8s/deploy/shim/containerd-shim-krun-v2 /root/opt/kontain/shim/containerd-shim-krun-v2
+      chmod +x /root/opt/kontain/shim/containerd-shim-krun-v2
+      cp /kontain-artifacts/cloud/k8s/deploy/shim/containerd-shim-krun-v2 /root/usr/local/bin/containerd-shim-krun-v2
+      chmod +x /root/usr/local/bin/containerd-shim-krun-v2
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app: kontain-init
+  name: kontain-install-lib
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: kontain-init
+  name: kontain-node-initializer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: kontain-init
+  template:
+    metadata:
+      labels:
+        app: kontain-init
+        name: kontain-node-initializer
+    spec:
+      containers:
+      - command:
+        - /scripts/entrypoint.sh
+        env:
+        - name: ROOT_MOUNT_DIR
+          value: /root
+        - name: CONTAINERD_CFG_DIR
+          value: /etc/containerd
+        - name: KONTAIN_RELEASE_URL
+          value: https://github.com/kontainapp/km/releases/download/v0.9.8/kontain_bin.tar.gz
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: centos:7
+        name: node-initializer
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /root
+          name: root-mount
+        - mountPath: /scripts-lib
+          name: lib-entrypoint
+        - mountPath: /scripts
+          name: entrypoint
+        - mountPath: /etc/crio/
+          name: crio-conf
+        - mountPath: /etc/containerd/
+          name: containerd-conf
+        - mountPath: /var/run/dbus
+          name: dbus
+        - mountPath: /run/systemd
+          name: systemd
+      volumes:
+      - hostPath:
+          path: /
+        name: root-mount
+      - configMap:
+          defaultMode: 484
+          name: kontain-install-entrypoint
+        name: entrypoint
+      - configMap:
+          defaultMode: 484
+          name: kontain-install-lib
+        name: lib-entrypoint
+      - hostPath:
+          path: /etc/crio/
+        name: crio-conf
+      - hostPath:
+          path: /etc/containerd/
+        name: containerd-conf
+      - hostPath:
+          path: /var/run/dbus
+        name: dbus
+      - hostPath:
+          path: /run/systemd
+        name: systemd
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: node.k8s.io/v1
+handler: krun
+kind: RuntimeClass
+metadata:
+  name: kontain
