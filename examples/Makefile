@@ -1,10 +1,12 @@
+all: build test kindcluster-clean kindcluster-up deployk8s testk8s kindcluster-clean
+
 build: buildgo buildjava buildjs buildpython
 
 test: testgo testjava testjs testpython
 
 push: pushgo pushjava pushjs pushpython
 
-deployk8s: deploysk8sgo deployk8sjava deployk8sjs deployk8spython
+deployk8s: deployk8sgo deployk8sjava deployk8sjs deployk8spython
 
 testk8s: testk8sgo testk8sjava testk8sjs testk8spython
 
