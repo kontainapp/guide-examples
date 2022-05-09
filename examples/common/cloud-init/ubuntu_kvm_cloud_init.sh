@@ -173,4 +173,5 @@ sudo mkdir -p /opt/kontain ; sudo chown root /opt/kontain
 curl -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/kontain-install.sh | sudo bash
 
 # clone Kontain examples
-git clone https://github.com/kontainapp/guide-examples.git
+cd /home/azure-user
+runuser -l azure-user -c 'git clone https://github.com/kontainapp/guide-examples.git'

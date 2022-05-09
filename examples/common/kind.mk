@@ -10,7 +10,8 @@ clouddevvmazure-up:
 	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
 	--ssh-key-name sm-key \
 	--admin-username azure-user \
-	--custom-data ./cloud-init/ubuntu_kvm_devvm_init.sh
+	--custom-data ./cloud-init/ubuntu_kvm_cloud_init.sh
+	sleep 20
 
 cloudvmazure-up:
 	az vm create \
