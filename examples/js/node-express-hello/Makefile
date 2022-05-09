@@ -1,8 +1,8 @@
 SHELL :=/bin/bash
 
 # import make targets for kind cluster
-include ../../common/common.mk
-include ../../common/build_args.env
+include ../../../infra/infra.mk
+include ../../../infra/build_args.env
 
 # exports all vars
 .EXPORT_ALL_VARIABLES:
