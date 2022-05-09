@@ -15,7 +15,7 @@ For example, you can install on Minikube using the instruction below on a deskto
 Install Kontain using a Daemonset
 ```bash
 # apply the daemonset
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km.yaml
+$ kubectl apply -f curl https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
 ```
 
 ## Post install steps
@@ -47,7 +47,7 @@ This is because this enables nested virtualization by default on that worker nod
 To install Kontain on AWS (with containerd) or GKE use:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 ```
 
 The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
@@ -60,7 +60,7 @@ To enable containerd as default rutime, please see: Enabling Containerd in EKS
 To install Kontain on K3s:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/k3s.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 ```
 
 The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
@@ -70,7 +70,7 @@ The above installs the Kontain runtime class and contains the libraries for inst
 To install Kontain on Openshift with CRIO:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/km-crio.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km-crio.yaml
 ```
 
 The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
