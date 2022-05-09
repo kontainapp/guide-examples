@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - apt update
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo env
+      - find ${CODEBUILD_SRC_DIR}
+  post_build:
+    commands:
+      - echo Build finished on `date`
+      - echo build ${CODEBUILD_BUILD_ID} and ${CODEBUILD_BUILD_NUMBER} is ${CODEBUILD_BUILD_SUCCEEDING}
