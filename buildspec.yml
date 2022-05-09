@@ -7,7 +7,7 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - echo env
+      - echo `env`
       - echo `pwd`
   post_build:
     commands:
