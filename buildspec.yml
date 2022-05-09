@@ -8,7 +8,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo env
-      - find ${CODEBUILD_SRC_DIR}
+      - echo `pwd`
   post_build:
     commands:
       - echo Build finished on `date`
