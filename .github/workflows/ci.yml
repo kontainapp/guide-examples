@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Install tools
+      - name: Install packages, language runtimes, tools
         run: |
           set -xe
           sudo apt-get update
@@ -190,7 +190,7 @@ jobs:
           # configure and restart docker with Kontain as runtime
           # systemctl restart --no-block docker
           sudo bash /opt/kontain/bin/docker_config.sh
-      - name: Test examples
+      - name: Test guide examples in docker and kubernetes (kind)
         run: |
           cd examples
           make examplestest
