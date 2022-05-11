@@ -126,16 +126,22 @@ jobs:
           sudo curl -Lo /usr/local/bin/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v3.2.3/kustomize_kustomize.v3.2.3_linux_amd64
           sudo chmod +x /usr/local/bin/kustomize
 
-          # install minikube
-          echo "installing minikube"
-          curl -Lo /usr/local/bin/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          sudo chmod +x /usr/local/bin/minikube
-
           # install kind
           echo "installing kind"
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
           chmod +x ./kind
           sudo mv ./kind /usr/local/bin/
+
+          # utilities
+          # install kubectl
+          echo "installing kubectl"
+          sudo apt-get install -y apt-transport-https ca-certificates curl
+          sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+
+          sudo apt-get update -y && sudo apt-get install -y kubectl
 
           # install azure cloud CLI
           echo "installing Azure CLI"
@@ -149,13 +155,35 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y azure-cli
 
-          # utilities
-          # install kubectl
-          echo "installing kubectl"
-          sudo apt-get install -y apt-transport-https ca-certificates curl
-          sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-          echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+          # install KKM
+          echo "installing KKM"
+          TAG=${1:-$(curl -L -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/current_release.txt)}
+          # forcing it to be latest
+          # TAG='latest'
+          if [[ $TAG = latest ]] ; then
+            readonly URL_KONTAIN_TAR_GZ="https://github.com/kontainapp/km/releases/${TAG}/download/kontain.tar.gz"
+            readonly URL_KONTAIN_BIN="https://github.com/kontainapp/km/releases/${TAG}/download/kontain_bin.tar.gz"
+          else
+            readonly URL_KONTAIN_TAR_GZ="https://github.com/kontainapp/km/releases/download/${TAG}/kontain.tar.gz"
+            readonly URL_KONTAIN_BIN="https://github.com/kontainapp/km/releases/download/${TAG}/kontain_bin.tar.gz"
+          fi
+          readonly PREFIX="/opt/kontain"
 
-          sudo apt-get update -y && sudo apt-get install -y kubectl
+          # download and move files into place
+          mkdir /tmp/kontain
+          cd /tmp/kontain
+          wget $URL_KONTAIN_BIN
+          tar xvzf kontain_bin.tar.gz
+
+          # move files into /opt/kontain
+          mkdir -p /opt/kontain/bin; chown root /opt/kontain
+          mv container-runtime/krun /opt/kontain/bin/
+          mv km/km /opt/kontain/bin/
+          mv bin/docker_config.sh /opt/kontain/bin/
+
+          # install KKM
+          ./kkm.run
+
+          # configure and restart docker with Kontain as runtime
+          # systemctl restart --no-block docker
+          bash /opt/kontain/bin/docker_config.sh

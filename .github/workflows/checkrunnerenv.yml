@@ -11,5 +11,7 @@ jobs:
       - name: Install tools
         run: |
           set -xe
-          ls /dev/kvm
+          # ls /dev/kvm
           lscpu
+          echo $USER
+          echo $HOME
