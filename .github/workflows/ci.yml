@@ -4,7 +4,7 @@ on: # push
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -190,3 +190,7 @@ jobs:
           # configure and restart docker with Kontain as runtime
           # systemctl restart --no-block docker
           sudo bash /opt/kontain/bin/docker_config.sh
+      - name: Test examples
+        run: |
+          cd examples
+          make examplestest
