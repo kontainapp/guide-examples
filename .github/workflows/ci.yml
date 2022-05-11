@@ -158,6 +158,9 @@ jobs:
           # install KKM
           echo "installing KKM"
           TAG=${1:-$(curl -L -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/current_release.txt)}
+          
+          echo "the tag is: ${TAG}"
+          
           # forcing it to be latest
           # TAG='latest'
           if [[ $TAG = latest ]] ; then
