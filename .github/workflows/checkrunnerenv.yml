@@ -15,3 +15,5 @@ jobs:
           lscpu
           echo $USER
           echo $HOME
+          docker --version
+          docker run hello-world
