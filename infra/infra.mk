@@ -106,7 +106,8 @@ kindcluster:
 kindcluster-apply-km:
 	echo
 	echo "applying km to kind cluster: kind-kind"
-	kubectl apply -f ./kustomize_outputs/km.yaml
+	# kubectl apply -f ./kustomize_outputs/km.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
 
 	sleep 5
 
@@ -147,7 +148,8 @@ minikubecluster-clean:
 minikubecluster-apply-km:
 	echo
 	echo "applying km to minikube cluster: minikube"
-	kubectl apply -f ./kustomize_outputs/km.yaml
+	# kubectl apply -f ./kustomize_outputs/km.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
 
 	sleep 5
 
@@ -181,7 +183,8 @@ akscluster:
 akscluster-apply-km:
 	echo "applying km to kind cluster: kdocscluster-aks"
 	# kubectl apply -f kustomize_outputs/km.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f ./kustomize_outputs/km.yaml
+	# kubectl apply -f ./kustomize_outputs/km.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
 	sleep 5
 
 	echo "waiting for kontain-node-initializer to be ready"
@@ -255,7 +258,7 @@ gkecluster:
 gkecluster-apply-kkm:
 	echo "applying kkm to kind cluster: kdocscluster-gke"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide/main/_k8s/kustomize_outputs/kkm.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 	sleep 5
 
 	echo "waiting for kontain-node-initializer to be running and applying KKM"
@@ -278,7 +281,8 @@ gkecluster-apply-flaskapp:
 
 	echo "deploying the Kontain flask app"
 	# kubectl apply -f apps/pyflaskappkontain.yml && kubectl rollout status deployment/flaskappkontain --timeout=60s
-	kubectl apply -f./kustomize_outputs/kkm.yaml
+	# kubectl apply -f./kustomize_outputs/kkm.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 	sleep 3
 
 	echo "waiting for flask app to be ready"
@@ -318,7 +322,7 @@ ekscluster-add-ng:
 ekscluster-apply-kkm:
 	echo "applying kkm to kind cluster: kdocscluster-eks-2"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
-	kubectl apply -f ./kustomize_outputs/kkm.yaml
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 	sleep 15
 
 	echo "waiting for kontain-node-initializer to be running and applying KKM"

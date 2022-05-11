@@ -1,4 +1,10 @@
-all: build test kindcluster-clean kindcluster-up deployk8s testk8s kindcluster-clean
+examplestest: build test kindcluster-clean kindcluster-up deployk8s testk8s kindcluster-clean
+
+aks: akscluster-up deployk8sgo testk8sgo akscluster-clean
+
+gke: gkecluster-up deployk8sgo testk8sgo gkecluster-clean
+
+eks: ekscluster-up deployk8sgo testk8sgo ekscluster-clean
 
 build: buildgo buildjava buildjs buildpython
 

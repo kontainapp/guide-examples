@@ -12,5 +12,12 @@ app.get('/', (req, res) => {
   res.send('Hello from Kontain!');
 });
 
+// Trap CTRL-C
+process.on('SIGINT', function (code) {
+  console.log('SIGINT received');
+  process.exit();
+});
+
+
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
