@@ -120,7 +120,7 @@ jobs:
               libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
           # ref: https://www.singlestoneconsulting.com/blog/setting-up-your-python-environment/
-          sudo runuser -l runner -c "curl https://pyenv.run | bash"
+          sudo runuser -l runner -c "[ ! -d "/home/runner/.pyenv" ] && curl https://pyenv.run | bash"
           sudo runuser -l runner -c "/home/runner/.pyenv/bin/pyenv install 3.9.12"
           sudo runuser -l runner -c "/home/runner/.pyenv/bin/pyenv global 3.9.12"
 
@@ -139,7 +139,7 @@ jobs:
           # NOTE - cant use amazon-linux-extras as they default to openjdk-17 or yum - as it installs older version fo maven - HAVE TO USE SDKMAN
           echo "installing sdkman and java"
 
-          sudo runuser  -l runner -c 'curl -s "https://get.sdkman.io" | bash'
+          sudo runuser  -l runner -c '[ ! -d "/home/runner/.pyenv" ] && curl -s "https://get.sdkman.io" | bash'
           sudo runuser  -l runner -c 'source /home/runner/.sdkman/bin/sdkman-init.sh && sdk install java 11.0.11.hs-adpt && sdk install maven'
           sudo runuser  -l runner -c ''
           cat <<EOF  >> /home/runner/.bash_profile
