@@ -27,6 +27,7 @@ buildjs:
 
 buildpython:
 	make -C python/py-flask-hello build
+	make -C python/fastapi-hello build
 
 testjava:
 	make -C java/spring-boot-hello test
@@ -39,6 +40,7 @@ testjs:
 
 testpython:
 	make -C python/py-flask-hello test
+	make -C python/fastapi-hello test
 
 pushjava:
 	make -C java/spring-boot-hello push
@@ -51,6 +53,7 @@ pushjs:
 
 pushpython:
 	make -C python/py-flask-hello push
+	make -C python/fastapi-hello push
 
 deployk8sjava:
 	make -C java/spring-boot-hello deployk8s
@@ -63,6 +66,7 @@ deployk8sjs:
 
 deployk8spython:
 	make -C python/py-flask-hello deployk8s
+	make -C python/fastapi-hello deployk8s
 
 testk8sjava:
 	make -C java/spring-boot-hello testk8s
@@ -75,6 +79,7 @@ testk8sjs:
 
 testk8spython:
 	make -C python/py-flask-hello testk8s
+	make -C python/fastapi-hello testk8s
 
 kindcluster-up:
 	make -C ../infra -f infra.mk kindcluster kindcluster-apply-km
