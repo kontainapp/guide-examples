@@ -8,6 +8,33 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+
+      - name: Cache pyenv
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-pyenv
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.pyenv
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/COMMANDS.md') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Cache sdkman
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-sdkman
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.sdkman
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/etc/config') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - name: Install packages, language runtimes, tools
         run: |
           set -xe
