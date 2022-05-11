@@ -182,8 +182,8 @@ jobs:
           sudo mv bin/docker_config.sh /opt/kontain/bin/
 
           # install KKM
-          ./kkm.run
+          sudo ./kkm.run
 
           # configure and restart docker with Kontain as runtime
           # systemctl restart --no-block docker
-          bash /opt/kontain/bin/docker_config.sh
+          sudo bash /opt/kontain/bin/docker_config.sh
