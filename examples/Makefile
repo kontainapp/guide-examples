@@ -1,3 +1,5 @@
+.PHONY: build
+
 examplestest: build test kindcluster-clean kindcluster-up deployk8s testk8s kindcluster-clean
 
 aks: akscluster-up deployk8sgo testk8sgo akscluster-clean

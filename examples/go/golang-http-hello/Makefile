@@ -18,7 +18,8 @@ ifneq (,$(wildcard ./.env))
 endif
 
 all: build test push composetest kindcluster kindcluster-apply-km deployk8s testk8s kindcluster-clean clean
-.PHONY: all
+
+.PHONY: build
 
 build:
 	echo

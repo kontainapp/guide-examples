@@ -1,3 +1,5 @@
+.PHONY: build
+
 #----------------------
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 # Azure VM

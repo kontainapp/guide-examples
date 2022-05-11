@@ -17,8 +17,9 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
+.PHONY: build
+
 all: build test push composetest kindcluster kindcluster-apply-km deployk8s testk8s kindcluster-clean clean
-.PHONY: all
 
 IMAGE_NAME="kontainguide/spring-boot-hello"
 
