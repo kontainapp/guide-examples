@@ -1,0 +1,21 @@
+name: Build on Ubuntu
+on: # push
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq
+          echo "installing git, other dependencies"
+          sudo apt install -y make gcc g++ git zip unzip wget jq curl
+
+          REPO_FOLDER=`pwd`
+          echo $REPO_FOLDER
+          ls -al
+          # install git and python pyenv dependencies
