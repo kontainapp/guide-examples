@@ -23,31 +23,31 @@ jobs:
           echo $REPO_FOLDER
           ls -al
 
-          # install docker
-          echo "installing Docker CE"
-          sudo apt-get install -y\
-              ca-certificates \
-              curl \
-              gnupg \
-              lsb-release
+          # # install docker
+          # echo "installing Docker CE"
+          # sudo apt-get install -y\
+          #     ca-certificates \
+          #     curl \
+          #     gnupg \
+          #     lsb-release
 
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+          # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-          echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          # echo \
+          #   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+          #   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-          sudo apt-get update -y
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+          # sudo apt-get update -y
+          # sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-          sudo systemctl enable docker
-          sudo usermod -aG docker runner
-          newgrp docker
-          sudo systemctl start docker.service
+          # sudo systemctl enable docker
+          # sudo usermod -aG docker runner
+          # newgrp docker
+          # sudo systemctl start docker.service
 
-          # enable and start docker daemon
-          echo "service enable and start docker"
-          sudo systemctl enable --now docker
+          # # enable and start docker daemon
+          # echo "service enable and start docker"
+          # sudo systemctl enable --now docker
 
           # compose
           echo "installing docker-compose"
@@ -176,10 +176,10 @@ jobs:
           tar xvzf kontain_bin.tar.gz
 
           # move files into /opt/kontain
-          mkdir -p /opt/kontain/bin; chown root /opt/kontain
-          mv container-runtime/krun /opt/kontain/bin/
-          mv km/km /opt/kontain/bin/
-          mv bin/docker_config.sh /opt/kontain/bin/
+          sudo mkdir -p /opt/kontain/bin; chown root /opt/kontain
+          sudo mv container-runtime/krun /opt/kontain/bin/
+          sudo mv km/km /opt/kontain/bin/
+          sudo mv bin/docker_config.sh /opt/kontain/bin/
 
           # install KKM
           ./kkm.run
