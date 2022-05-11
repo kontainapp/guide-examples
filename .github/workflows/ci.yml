@@ -176,7 +176,7 @@ jobs:
           tar xvzf kontain_bin.tar.gz
 
           # move files into /opt/kontain
-          sudo mkdir -p /opt/kontain/bin; chown root /opt/kontain
+          sudo mkdir -p /opt/kontain/bin
           sudo mv container-runtime/krun /opt/kontain/bin/
           sudo mv km/km /opt/kontain/bin/
           sudo mv bin/docker_config.sh /opt/kontain/bin/
