@@ -1,10 +1,12 @@
 # Description
 This example shows Kontain running a Spring Boot REST API example with a backing MySQL DB.  The REST API persists entries in a MySQL DB, and the API is also be used to retrieve the entries.
 
-Referred from:
-https://www.bezkoder.com/docker-compose-spring-boot-mysql/
-and
-https://www.bezkoder.com/spring-boot-jpa-crud-rest-api/
+Reference from:
+https://www.bezkoder.com/docker-compose-spring-boot-mysql/ and https://www.bezkoder.com/spring-boot-jpa-crud-rest-api/
+
+Please note that this shows that we can continue to use the normal Dockerfile without any conversion to using  Kontain-based language runtime.
+
+This allows us to experience Kontain with existing Dockerfiles and images but without the benefit of smaller image sizes.
 
 # to build this example
 ```bash
