@@ -90,6 +90,26 @@ build-overlays:
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/try-v0.9.8" > ./kustomize_outputs/kkm.yaml
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/k3s?ref=sm/try-v0.9.8" > ./kustomize_outputs/k3s.yaml
 
+#--------------------------------------------------------------------------------
+# Deploy and test a app in kubernetes for sake of testing the Daemonset artifact
+#--------------------------------------------------------------------------------
+deployk8s:
+	echo
+	echo "deploying golang-http-hello to cluster kind..."
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/examples/go/golang-http-hello/k8s.yml
+	sleep 10
+	kubectl -n default wait pod --for=condition=Ready -l app=golang-http-hello --timeout=240s
+	sleep 2
+
+testk8s:
+	echo
+	echo "testing golang-http-hello..."
+	kubectl port-forward svc/golang-http-hello 8080:8080 2>/dev/null &
+	sleep 15
+	curl -vvv http://localhost:8080
+	sleep 3
+	- pkill -f "port-forward"
+
 #----------------------
 # kind cluster
 #----------------------
@@ -201,25 +221,6 @@ akscluster-apply-km:
 	cat /tmp/kontain-node-initializer-aks.log
 
 	sleep 10
-
-
-akscluster-apply-flaskapp:
-	echo "deploying kontain flask app to cluster: kdocscluster-aks"
-
-	# cleaning the app in case its already deployed, ignore error if present
-	- kubectl delete -f apps/pyflaskappkontain.yml
-	sleep 5
-
-	echo "deploying the Kontain flask app"
-	# kubectl apply -f apps/pyflaskappkontain.yml && kubectl rollout status deployment/flaskappkontain --timeout=60s
-	kubectl apply -f apps/pyflaskappkontain.yml
-	sleep 3
-
-	echo "waiting for flask app to be ready"
-	kubectl -n default wait pod --for=condition=Ready -l app=flaskappkontain --timeout=240s
-
-	echo "getting pods in default NS"
-	kubectl get po
 
 akscluster-clean:
 	echo "deleting cluster: kdocscluster_aks"
