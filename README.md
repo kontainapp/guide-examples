@@ -7,7 +7,9 @@
 
 For more information you can refer to:
 [The Kontain website](https://kontain.app)
+
 [The Kontain project github](https://github.com/kontainapp/km)
+
 [The Kontain guide](https://kontainapp.github.io/guide)
 
 # Examples
