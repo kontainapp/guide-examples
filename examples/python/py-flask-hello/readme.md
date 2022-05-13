@@ -20,7 +20,6 @@ kontainapp/runenv-python-3.8 v0.9.1               aee035a4b2bc   7 months ago   
 # to run this example
 ```bash
 $ docker run -d --rm -p 5000:5000 --runtime=krun --name py-flask-hello kontainguide/py-flask-hello:1.0
-```
 
 # invoke the service
 $ curl -v http://localhost:5000
