@@ -1,5 +1,5 @@
 # Kontain
-[Kontain])(https://github.com/kontainapp/km) is a new secure runtime for Docker and Kubernetes that provides:
+[Kontain](https://github.com/kontainapp/km) is a new secure runtime for Docker and Kubernetes that provides:
 - VM-level hardware-based workload isolation packaged as OCI images
 - works as a runtime alongside default runtimes in Docker and Kubernetes
 - uses normal Docker and Kubernetes tooling and CI/CD systems/processes
