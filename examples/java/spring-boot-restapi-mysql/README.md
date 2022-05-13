@@ -1,7 +1,7 @@
-# reference
-This example shows Kontain running a Spring Boot REST API example.  The REST API persists entries in a MySQL DB, and the API can also be used to retrieve the entries.
+# Description
+This example shows Kontain running a Spring Boot REST API example with a backing MySQL DB.  The REST API persists entries in a MySQL DB, and the API is also be used to retrieve the entries.
 
-Reference from:
+Referred from:
 https://www.bezkoder.com/docker-compose-spring-boot-mysql/
 and
 https://www.bezkoder.com/spring-boot-jpa-crud-rest-api/

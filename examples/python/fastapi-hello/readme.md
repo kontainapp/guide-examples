@@ -1,3 +1,8 @@
+# Description
+This example shows how to build, push, run a Python FastAPI based app in Docker and Kubernetes with Kontain as the runtime.
+
+The difference between this and the Flask API based example is that we run the Docker image as is without any conversion to Kontain based containers, but yet provide a secure environment.  Thus this does not reduce the size but enables the convenience of using current containers as-is without any changes.
+
 # to build this example
 ```bash
 $ docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=python:3.9-slim --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python-3.9:latest -t kontainguide/fastapi-hello:1.0 .

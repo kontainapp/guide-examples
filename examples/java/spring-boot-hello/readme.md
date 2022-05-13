@@ -1,6 +1,9 @@
+# Description
+This shows how to create, build, push and run a simple Spring Boot based Container with Kontain in Docker and Kubernetes.
+
 # to build this example
 ```bash
-$ docker build --build-arg OPEN_JDK_BUILD_VERSION=openjdk:11-jdk-slim-buster --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=kontainapp/runenv-jdk-shell-11.0.8:latest -t kontainguide/spring-boot-hello:1.0 .
+$ docker build -t kontainguide/spring-boot-hello:1.0 .
 ```
 
 # see image sizes
@@ -12,6 +15,8 @@ kontainapp/runenv-jdk-shell-11.0.8 latest              179MB
 kontainguide/spring-boot-hello     1.0                 197MB
 ...
 ```
+
+**Please note the image size of the base container at 422MB and that of the Kontain container at 197MB.**
 
 # to run this example
 ```bash

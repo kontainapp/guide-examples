@@ -1,3 +1,6 @@
+# Description
+This example shows how to build, push, run a Python Flask based app in a Kontain container in Docker and Kubernetes.
+
 # to build this example
 ```bash
 $ docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=python:3.9-slim --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python-3.9:latest -t kontainguide/py-flask-hello:1.0 .
@@ -11,6 +14,8 @@ python                       3.8-slim             5ce3cfb9de89   8 days ago     
 python                       3.9-slim             8c7051081f58   8 days ago          125MB
 kontainapp/runenv-python-3.8 v0.9.1               aee035a4b2bc   7 months ago        23.5MB
 ```
+
+**Please note that the Kontain based container is 23.5MB in size versus the "Slim" python-slim base container**
 
 # to run this example
 ```bash

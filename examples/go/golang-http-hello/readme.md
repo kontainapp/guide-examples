@@ -1,3 +1,6 @@
+# Description
+This is a golang-based example of using Kontain to build, push, run a secure Kontain container in Docker and Kubernetes.
+
 # to build this example
 ```bash
 $ docker build -t kontainguide/golang-http-hello:1.0 .
@@ -10,6 +13,8 @@ kontainguide/golang-http-hello  1.0      1071c7cf9d97   37 minutes ago      6.24
 kontainguide/golang-http-hello  latest   1071c7cf9d97   37 minutes ago      6.24MB
 golang                          latest   65375c930b21   8 days ago          964MB
 ```
+
+**Note that the kontainguide/golang-http-hello image is 6.2MB whereas the base golang imageis 964MB.**
 
 # to run this example
 ```bash
@@ -33,7 +38,7 @@ $ curl -v http://localhost:8080
 $ docker-compose down
 ```
 
-# to run this example kubernetes
+# to run this example in kubernetes
 ```bash
 
 $ kubectl apply -f k8s.yml

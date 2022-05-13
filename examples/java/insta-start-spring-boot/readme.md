@@ -1,3 +1,8 @@
+# Description
+This example shows how to use Kontain to create an instantly starting Sping Boot Kontain based container.
+
+This allows you to instantly start up a container without having to wait a few seconds.
+
 # to build this example
 ```bash
 $ docker build --build-arg OPEN_JDK_BUILD_VERSION=openjdk:11-jdk-slim-buster --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=kontainapp/runenv-jdk-shell-11.0.8:latest -t kontainguide/spring-boot-hello:1.0 .
