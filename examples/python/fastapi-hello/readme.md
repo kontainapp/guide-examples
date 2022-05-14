@@ -5,7 +5,7 @@ The difference between this and the Flask API based example is that we run the D
 
 # to build this example
 ```bash
-$ docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=python:3.9-slim --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python-3.9:latest -t kontainguide/fastapi-hello:1.0 .
+$ docker build -t kontainguide/fastapi-hello:1.0 .
 ```
 
 # to run this example
