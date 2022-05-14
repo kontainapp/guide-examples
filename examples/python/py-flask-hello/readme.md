@@ -3,7 +3,7 @@ This example shows how to build, push, run a Python Flask based app in a Kontain
 
 # to build this example
 ```bash
-$ docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=python:3.9-slim --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=kontainapp/runenv-python-3.9:latest -t kontainguide/py-flask-hello:1.0 .
+$ docker build -t kontainguide/py-flask-hello:1.0 .
 ```
 
 # see image sizes
