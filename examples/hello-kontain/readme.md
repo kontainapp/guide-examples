@@ -17,7 +17,7 @@ make push
 # to run
 ```bash
 make run
-docker run --rm --runtime=krun --rm kontainguide/hello-kontain
+docker run --rm --runtime=krun kontainguide/hello-kontain
 Hello, world
 Hello, argv[0] = '/hello_test.km'
 Hello, argv[1] = 'from'
