@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hellospring
+spec:
+  template:
+    metadata:
+      # This is the name of our new "Revision," it must follow the convention {service-name}-{revision-name}
+      name: hellospring-kontain
+    spec:
+      runtimeClassName: kontain
+      containers:
+        - image: sandman2k/springboothello:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TARGET
+              value: "Spring Kontain"
