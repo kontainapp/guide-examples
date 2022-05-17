@@ -23,7 +23,7 @@ kontainguide/spring-boot-hello-docker  1.0                 439MB
 ...
 ```
 
-**Please note the image size of the base container at 422MB and that of the Kontain container at 197MB.**
+**Please note the image size of the base container at 439MB and that of the Kontain container at 197MB.**
 
 # to run this example
 ```bash
