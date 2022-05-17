@@ -7,13 +7,19 @@ $ mvn clean compile package -Dmaven.test.skip
 $ docker build -t kontainguide/spring-boot-hello:1.0 .
 ```
 
+Out of curiousity to see image sizes, let's build the plain Docker image:
+```bash
+$ docker build -t kontainguide/spring-boot-hello-docker:1.0 -f Dockerfile.docker .
+```
+
 # see image sizes
 ```bash
 $ docker images | grep -E 'spring|jdk'
 ...
-openjdk                            11-jdk-slim-buster  422MB
-kontainapp/runenv-jdk-shell-11.0.8 latest              179MB
-kontainguide/spring-boot-hello     1.0                 197MB
+openjdk                                11-jdk-slim-buster  422MB
+kontainapp/runenv-jdk-shell-11.0.8     latest              179MB
+kontainguide/spring-boot-hello         1.0                 197MB
+kontainguide/spring-boot-hello-docker  1.0                 439MB
 ...
 ```
 
