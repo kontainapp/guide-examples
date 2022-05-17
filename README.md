@@ -13,6 +13,9 @@ For more information you can refer to:
 
 [The Kontain guide](https://kontainapp.github.io/guide)
 
+# Guide Examples
+This is the examples repo for the [Kontain User Guide](https://kontainapp.github.io/guide/).
+
 # Examples
 [Examples](/examples/) for Kontain with golang, Java, Python, Javascript/NodeJS
 
