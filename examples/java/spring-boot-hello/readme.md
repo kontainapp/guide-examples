@@ -3,6 +3,7 @@ This shows how to create, build, push and run a simple Spring Boot based Contain
 
 # to build this example
 ```bash
+$ mvn clean compile package -Dmaven.test.skip
 $ docker build -t kontainguide/spring-boot-hello:1.0 .
 ```
 
