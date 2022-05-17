@@ -3,27 +3,35 @@ This shows how to create, build, push and run a simple Spring Boot based Contain
 
 # to build this example
 ```bash
+$ mvn clean compile package -Dmaven.test.skip
 $ docker build -t kontainguide/spring-boot-hello:1.0 .
+```
+
+Out of curiousity to see image sizes, let's build the plain Docker image:
+```bash
+$ docker build -t kontainguide/spring-boot-hello-docker:1.0 -f Dockerfile.docker .
 ```
 
 # see image sizes
 ```bash
 $ docker images | grep -E 'spring|jdk'
 ...
-openjdk                            11-jdk-slim-buster  422MB
-kontainapp/runenv-jdk-shell-11.0.8 latest              179MB
-kontainguide/spring-boot-hello     1.0                 197MB
+openjdk                                11-jdk-slim-buster  422MB
+kontainapp/runenv-jdk-shell-11.0.8     latest              179MB
+kontainguide/spring-boot-hello         1.0                 197MB
+kontainguide/spring-boot-hello-docker  1.0                 439MB
 ...
 ```
 
-**Please note the image size of the base container at 422MB and that of the Kontain container at 197MB.**
+**Please note the image size of the base container at 439MB and that of the Kontain container at 197MB.**
 
 # to run this example
 ```bash
 $ docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-hello kontainguide/spring-boot-hello:1.0
 
 # invoke the service
-$ curl -v http://localhost:8080
+$ curl http://localhost:8080
+Hello from Kontain!
 
 $ docker stop spring-boot-hello
 ```
