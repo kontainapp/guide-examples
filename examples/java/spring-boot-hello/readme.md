@@ -24,7 +24,8 @@ kontainguide/spring-boot-hello     1.0                 197MB
 $ docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-hello kontainguide/spring-boot-hello:1.0
 
 # invoke the service
-$ curl -v http://localhost:8080
+$ curl http://localhost:8080
+Hello from Kontain!
 
 $ docker stop spring-boot-hello
 ```
