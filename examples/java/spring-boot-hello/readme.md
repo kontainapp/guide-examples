@@ -63,3 +63,15 @@ $ curl -vvv http://localhost:8080
 # kill the port-forward
 $ pkill -f "port-forward"
 ```
+
+# NOTE for using JIB based builds
+To use jib-based build for the same image you can do:
+```shell
+$ make jib-build
+```
+this creates a docker image named “kontainguide/spring-boot-hello:1.0” not using “docker build…” steps but using the maven Jib plugin-based build.
+
+Note that it DOES NOT use a Dockerfile - just builds Docker image by itself using internal APIs
+
+To run this using Kontain you can use:
+$ docker run -p8080:8080 --runtime=krun kontainguide/spring-boot-hello:1.0
