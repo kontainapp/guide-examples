@@ -16,7 +16,7 @@ $ docker-compose up
 ```
 
 # test
-to test the API:
+to test the API from terminal 2:
 ```shell
 $ curl http://localhost:8080/api/v1/products
 [{"name":"Monster Tulpar T7 V20.4 Dizüstü Bilgisayar","description":"Monster Tulpar T7 V20.4 Dizüstü Bilgisayar","price":17.099,"category":"Dizüstü Bilgisayar"},{"name":"HP Pavilion Gaming 15-ec2033nt 4G8U0EA Dizüstü Bilgisayar","description":"HP Pavilion Gaming 15-ec2033nt 4G8U0EA Dizüstü Bilgisayar","price":10.199,"category":"Dizüstü Bilgisayar"},{"name":"Apple MacBook Air 13.3 İnç M1 MGN73TU/A Dizüstü Bilgisayar","description":"Apple MacBook Air 13.3 İnç M1 MGN73TU/A Dizüstü Bilgisayar","price":12.396,"category":"Dizüstü Bilgisayar"}]azure-user@smdev1:~/guide-examples/examples/java/spring-boot-postgresql$
