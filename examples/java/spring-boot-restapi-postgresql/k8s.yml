@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-restapi-postgresql
+  labels:
+    app: spring-boot-restapi-postgresql
+spec:
+  type: ClusterIP 
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: spring-boot-restapi-postgresql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-restapi-postgresql
+  labels:
+    app: spring-boot-restapi-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-restapi-postgresql
+  template:
+    metadata:
+      labels:
+        app: spring-boot-restapi-postgresql
+    spec:
+      runtimeClassName: kontain
+      containers:
+      - name: spring-boot-restapi-postgresql
+        image: kontainguide/spring-boot-restapi-postgresql:1.0
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,26 @@
+version: '3.1'
+services:
+  backend:
+    runtime: krun
+    container_name: spring-boot-restapi-postgresql
+    image: kontainguide/spring-boot-restapi-postgresql
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - "PostgreSQL"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://PostgreSQL:5432/demo_db
+      SPRING_DATASOURCE_USERNAME: "compose_postgres"
+      SPRING_DATASOURCE_PASSWORD: "compose_postgres"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+
+  PostgreSQL:
+    container_name: postgres_db
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=compose_postgres
+      - POSTGRES_USER=compose_postgres
+      - POSTGRES_DB=demo_db

@@ -6,6 +6,8 @@ https://www.bezkoder.com/docker-compose-spring-boot-mysql/ and https://www.bezko
 
 Please note that this shows that we can continue to use the normal Dockerfile without any conversion to using  Kontain-based language runtime.
 
+Note that we use runtime:krun in the docker-compose file to show that we use Kontain as the secure Docker runtime.
+
 This allows us to experience Kontain with existing Dockerfiles and images but without the benefit of smaller image sizes.
 
 # to build this example
