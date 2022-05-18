@@ -3,55 +3,24 @@ This example shows how to use Kontain to create an instantly starting Sping Boot
 
 This allows you to instantly start up a container without having to wait a few seconds.
 
-# to build this example
+# to build the Inststart Snapshot Container of this Spring boot Container
 ```bash
-$ docker build --build-arg OPEN_JDK_BUILD_VERSION=openjdk:11-jdk-slim-buster --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=kontainapp/runenv-jdk-shell-11.0.8:latest -t kontainguide/spring-boot-hello:1.0 .
+# In terminal 1 do:
+$ make build
+$ make run
+
+# in terminal 2 do:
+$ make snapshot
 ```
 
-# see image sizes
-```bash
-$ docker images | grep -E 'spring|jdk'
-...
-openjdk                            11-jdk-slim-buster  422MB
-kontainapp/runenv-jdk-shell-11.0.8 latest              179MB
-kontainguide/spring-boot-hello     1.0                 197MB
-...
-```
+This creates an Instastart Snapshot container of the application
 
-# to run this example
+# to run and experience the "Instantly starting" Spring Boot Container
 ```bash
-$ docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-hello kontainguide/spring-boot-hello:1.0
+# in terminal 1
+$ make runsnapshot
 
-# invoke the service
+# in terminal 2 do this immediately
+# invoke the service 
 $ curl -v http://localhost:8080
-
-$ docker stop spring-boot-hello
-```
-
-# to run this example in docker-compose
-```bash
-$ docker-compose up -d
-
-# invoke the service
-$ curl -v http://localhost:8080
-
-# shut down compose
-$ docker-compose down
-```
-
-# to run this example in kubernetes
-```bash
-$ kubectl apply -f k8s.yml
-
-# check that the pod is ready
-$ kubectl get pods -w
-
-# port-forward the port
-$ kubectl port-forward svc/spring-boot-hello 8080:8080 2>/dev/null &
-
-# invoke the service
-$ curl -vvv http://localhost:8080
-
-# kill the port-forward
-$ pkill -f "port-forward"
 ```
