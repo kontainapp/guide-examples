@@ -30,7 +30,7 @@ build:
 	docker build --build-arg OPEN_JDK_BUILD_VERSION=${OPEN_JDK_BUILD_VERSION} --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=${OPEN_JDK_KONTAIN_RELEASE_VERSION}  -t ${IMAGE_NAME}:1.0 .
 	docker tag ${IMAGE_NAME}:1.0 ${IMAGE_NAME}:latest
 
-jibbuild:
+jib-build:
 	echo
 	echo "building spring-boot-hello with jib..."
 	mvn clean compile package jib:build -Djib.to.image=${IMAGE_NAME}:1.0 -Dmaven.test.skip
