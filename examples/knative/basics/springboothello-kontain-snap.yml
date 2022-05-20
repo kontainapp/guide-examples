@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: hello-kontain-snap
+spec:
+  template:
+    spec:
+      runtimeClassName: kontain
+      containers:
+        - image: kontainguide/insta-start-spring-boot-snap:1.0
+          ports:
+            - containerPort: 8080

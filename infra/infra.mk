@@ -375,3 +375,74 @@ ekscluster-drain-ng:
 
 ekscluster-clean:
 	eksctl delete cluster --name EKS
+
+#----------------------
+# Kind with KNative
+#----------------------
+knativecluster-plugins:
+	# ref: https://knative.dev/docs/getting-started/quickstart-install/#install-the-knative-cli
+	echo
+	echo "installing knative with kind cluster..."
+	echo "downloading kn CLI"
+	sudo curl -s -Lo /usr/local/bin/kn https://github.com/knative/client/releases/download/knative-v1.4.1/kn-linux-amd64
+	sudo chmod +x /usr/local/bin/kn
+	sleep 2
+	echo
+	echo "downloading kn quickstart plugin binary"
+	sudo curl -s -Lo /usr/local/bin/kn-quickstart https://github.com/knative-sandbox/kn-plugin-quickstart/releases/download/knative-v1.4.0/kn-quickstart-linux-amd64
+	sudo chmod +x /usr/local/bin/kn-quickstart
+	echo
+	echo "checking knative quickstart plugin"
+	kn quickstart --help
+	echo
+
+knativekindcluster:
+	echo
+	echo "starting knative kind cluster..."
+	kn quickstart kind
+	sleep 15
+	echo "getting clusters"
+	kind get clusters
+	echo
+
+knativekindcluster-apply-km:
+	echo
+	echo "applying Kontain daemonset yaml..."
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
+
+	sleep 5
+
+	echo "waiting for kontain-node-initializer to be ready"
+	kubectl -n kube-system wait pod --for=condition=Ready -l name=kontain-node-initializer --timeout=240s
+
+	sleep 5
+	echo "saving log output of kontain-node-initiliazer daemonset pod"
+	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-kind.log
+
+	sleep 20
+	kubectl get po -A
+	cat /tmp/kontain-node-initializer-kind.log	
+
+
+knativekindcluster-test:
+	echo
+	echo "deploying hello service to cluster..."
+	- kn service delete hello
+	# kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
+	# or
+	kubectl apply -f ./hello-svc.yml
+
+	sleep 10
+	echo "list services"
+	kn service list
+	# kubectl get svc
+
+	echo
+	echo "invoking service"
+	echo Accessing URL at: $$(kn service describe hello -o url)
+	curl $$(kn service describe hello -o url)
+
+	echo
+	echo "deleting service hello"
+	# kn service delete hello
+	kubectl delete -f ./hello-svc.yml

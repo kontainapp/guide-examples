@@ -2,8 +2,8 @@ apiVersion: skaffold/v1beta1
 kind: Config
 build:
   artifacts:
-  - image: oscarrrenalias/golang-http-server
+  - image: kontainguide/golang-http-hello:1.0
 deploy:
   kubectl:
     manifests:
-    - golang-http-server-k8s.yml
+    - k8s.yml
