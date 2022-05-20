@@ -299,6 +299,7 @@ gkecluster-clean:
 	- kubectl config delete-context "kdocscluster-gke"
 	gcloud container clusters delete --quiet "kdocscluster-gke"
 
+
 #--------------
 # EKS Cluster
 #--------------
@@ -376,10 +377,13 @@ ekscluster-drain-ng:
 ekscluster-clean:
 	eksctl delete cluster --name EKS
 
+
 #----------------------
 # Kind with KNative
 #----------------------
-knativecluster-plugins:
+knativekind-install-test: knativecluster-plugins-install knativekindcluster knativekindcluster-apply-km knativekindcluster-test knativekindcluster-clean
+
+knativecluster-plugins-install:
 	# ref: https://knative.dev/docs/getting-started/quickstart-install/#install-the-knative-cli
 	echo
 	echo "installing knative with kind cluster..."
@@ -391,22 +395,29 @@ knativecluster-plugins:
 	echo "downloading kn quickstart plugin binary"
 	sudo curl -s -Lo /usr/local/bin/kn-quickstart https://github.com/knative-sandbox/kn-plugin-quickstart/releases/download/knative-v1.4.0/kn-quickstart-linux-amd64
 	sudo chmod +x /usr/local/bin/kn-quickstart
+	sleep 2
 	echo
 	echo "checking knative quickstart plugin"
 	kn quickstart --help
 	echo
 
+
 knativekindcluster:
 	echo
-	echo "starting knative kind cluster..."
+	echo starting knative kind cluster...
 	kn quickstart kind
 	sleep 15
 	echo "getting clusters"
 	kind get clusters
 	echo
 
+
 knativekindcluster-apply-km:
 	echo
+	echo "patching configmap/config-features to enable podspec.runtimeclassname for installing KM..."
+	kubectl patch configmap/config-features -n knative-serving --type merge -p '{"data":{"kubernetes.podspec-runtimeclassname": "enabled"}}'
+
+	sleep 5
 	echo "applying Kontain daemonset yaml..."
 	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
 
@@ -422,15 +433,16 @@ knativekindcluster-apply-km:
 	sleep 20
 	kubectl get po -A
 	cat /tmp/kontain-node-initializer-kind.log	
+	sleep 5
 
 
 knativekindcluster-test:
 	echo
+	echo testing the knative kind cluster with Kontain installed
 	echo "deploying hello service to cluster..."
-	- kn service delete hello
+	- kn service delete hello-kontain
 	# kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
-	# or
-	kubectl apply -f ./hello-svc.yml
+	kn service create hello-kontain --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
 
 	sleep 10
 	echo "list services"
@@ -439,10 +451,17 @@ knativekindcluster-test:
 
 	echo
 	echo "invoking service"
-	echo Accessing URL at: $$(kn service describe hello -o url)
-	curl $$(kn service describe hello -o url)
+	echo Accessing URL at: $$(kn service describe hello-kontain -o url)
+	curl $$(kn service describe hello-kontain -o url)
 
+	sleep 5
 	echo
-	echo "deleting service hello"
-	# kn service delete hello
-	kubectl delete -f ./hello-svc.yml
+	echo "deleting service hello-kontain"
+	kn service delete hello-kontain
+
+knativekindcluster-clean:
+	echo
+	echo deleting cluster knative...
+	sleep 5
+	kind delete clusters knative
+	kind get clusters

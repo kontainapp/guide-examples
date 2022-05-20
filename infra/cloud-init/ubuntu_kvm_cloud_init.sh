@@ -131,6 +131,24 @@ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/
 
+# knative plugins for kind installs
+# ref: https://knative.dev/docs/getting-started/quickstart-install/#install-the-knative-cli
+echo
+echo "installing knative plugins for kind..."
+echo "downloading kn CLI"
+sudo curl -s -Lo /usr/local/bin/kn https://github.com/knative/client/releases/download/knative-v1.4.1/kn-linux-amd64
+sudo chmod +x /usr/local/bin/kn
+sleep 2
+echo
+echo "downloading kn quickstart plugin binary"
+sudo curl -s -Lo /usr/local/bin/kn-quickstart https://github.com/knative-sandbox/kn-plugin-quickstart/releases/download/knative-v1.4.0/kn-quickstart-linux-amd64
+sudo chmod +x /usr/local/bin/kn-quickstart
+echo
+sleep 2
+echo "checking knative quickstart plugin"
+kn quickstart --help
+echo
+
 # install azure cloud CLI
 echo "installing Azure CLI"
 sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg

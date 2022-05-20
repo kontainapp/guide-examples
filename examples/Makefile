@@ -107,3 +107,13 @@ ekscluster-up:
 
 ekscluster-clean:
 	make -C ../infra -f infra.mk ekscluster-clean
+
+#-------------
+knativekindcluster-up:
+	make -C ../infra -f infra.mk knativekindcluster knativekindcluster-apply-km
+
+knativekindcluster-clean:
+	make -C ../infra -f infra.mk knativekindcluster-clean
+
+knativekindcluster-test:
+	make -C knative/basics test
