@@ -22,5 +22,8 @@ This is the examples repo for the [Kontain User Guide](https://kontainapp.github
 # Installing Kontain
 [Install Kontain on Ubuntu 20.04 or later or Fedora 34 or Amazon Linux 2 with Kernel 5.10](/install/)
 
-# In Kubernetes
+# Install in Kubernetes
 [Installing Kontain in Kubernetes (Regular or AKS, EKS, GKE) ](/install_in_kubernetes/)
+
+# In KNative
+[Using Kontain-enabled secure functions in KNative](/examples/knative/basics)
