@@ -73,7 +73,7 @@ Hello Kontain!
 ```
 
 ## Working with snapshot of a KNative Kontain-enabled services
-## Working with a Spring Boot Java KNative service
+#### Working with a Spring Boot Java KNative service
 At first, we will show the regular spring boot knative service running, and replying to a request from scale to zero state.
 
 ```shell
@@ -99,7 +99,7 @@ Hello from Kontain!
 # Note that it takes about 8 seconds for it to respond
 ```
 
-## Working with a previously snapshotted Spring Boot Java KNative service
+#### Working with a previously snapshotted Spring Boot Java KNative service
 Now, we will show the same spring boot knative service in scale to zero state, and then starting up reply to reply to a request from scale to zero state.
 ```shell
 # deploy the knative spring boot hello service
