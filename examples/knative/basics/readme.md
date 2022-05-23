@@ -19,7 +19,8 @@ $ make knativecluster-plugins-install
 $ make knativekindcluster-up
 ```
 
-## Working with KNative Kontain-enabled services
+## Working with a KNative Kontain-enabled service
+#### deploy the service
 ```shell
 # install the Kontain-enabled function as a service
 $ kubectl apply -f hello-kontain-svc.yml 
