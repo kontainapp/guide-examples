@@ -7,7 +7,7 @@ This allows you to instantly start up a container without having to wait a few s
 ```bash
 # In terminal 1 do:
 $ make build
-$ make run
+$ make run-for-snap
 
 # in terminal 2 do:
 $ make snapshot

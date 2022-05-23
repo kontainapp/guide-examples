@@ -38,6 +38,9 @@ push:
 	docker push ${IMAGE_NAME}-snap:latest
 
 run:
+	docker run --runtime=krun --rm -p 8080:8080 ${IMAGE_NAME}
+
+run-for-snap:
 	docker run --runtime=krun --name=KM_instaspringboothello -p 8080:8080 -v /opt/kontain/bin/km_cli:/opt/kontain/bin/km_cli -v $(pwd):/mnt:rw ${IMAGE_NAME}
 
 snapshot:
