@@ -90,25 +90,6 @@ build-overlays:
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/try-v0.9.8" > ./kustomize_outputs/kkm.yaml
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/k3s?ref=sm/try-v0.9.8" > ./kustomize_outputs/k3s.yaml
 
-#--------------------------------------------------------------------------------
-# Deploy and test a app in kubernetes for sake of testing the Daemonset artifact
-#--------------------------------------------------------------------------------
-deployk8s:
-	echo
-	echo "deploying golang-http-hello to cluster kind..."
-	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/examples/go/golang-http-hello/k8s.yml
-	sleep 10
-	kubectl -n default wait pod --for=condition=Ready -l app=golang-http-hello --timeout=240s
-	sleep 2
-
-testk8s:
-	echo
-	echo "testing golang-http-hello..."
-	kubectl port-forward svc/golang-http-hello 8080:8080 2>/dev/null &
-	sleep 15
-	curl -vvv http://localhost:8080
-	sleep 3
-	- pkill -f "port-forward"
 
 #----------------------
 # kind cluster

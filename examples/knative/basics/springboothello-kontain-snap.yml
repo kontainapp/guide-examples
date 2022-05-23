@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: hello-kontain-snap
+  name: hello-kontain-spring-boot-snap
 spec:
   template:
     spec:
