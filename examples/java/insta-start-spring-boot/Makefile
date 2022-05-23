@@ -57,5 +57,5 @@ snapshot:
 	docker tag ${IMAGE_NAME}-snap:1.0 ${IMAGE_NAME}-snap:latest
 
 
-runsnapshot:
+run-snapshot:
 	docker run --runtime=krun --rm -it --name=KM_instaspringboothello_snap -p 8080:8080 ${IMAGE_NAME}-snap

@@ -18,7 +18,7 @@ This creates an Instastart Snapshot container of the application
 # to run and experience the "Instantly starting" Spring Boot Container
 ```bash
 # in terminal 1
-$ make runsnapshot
+$ make run-snapshot
 
 # in terminal 2 do this immediately
 # invoke the service 
