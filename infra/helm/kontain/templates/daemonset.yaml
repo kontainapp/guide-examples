@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: kontain-init
+  name: kontain-node-initializer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: kontain-init
+  template:
+    metadata:
+      labels:
+        app: kontain-init
+        name: kontain-node-initializer
+    spec:
+      containers:
+      - command:
+        - /scripts/entrypoint.sh
+        env:
+        - name: ROOT_MOUNT_DIR
+          value: /root
+        - name: CONTAINERD_CFG_DIR
+          {{- if eq .Values.install_type "k3s" }}
+          value: {{ .Values.k3s_install_config.CONTAINER_CFG_DIR | toYaml | indent 4 }}
+          {{- else }}
+          value: /etc/containerd
+          {{- end }}
+        - name: KONTAIN_RELEASE_URL
+          value: https://github.com/kontainapp/km/releases/download/v0.9.8/kontain_bin.tar.gz
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: centos:7
+        name: node-initializer
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /root
+          name: root-mount
+        - mountPath: /scripts-lib
+          name: lib-entrypoint
+        - mountPath: /scripts
+          name: entrypoint
+        - mountPath: /etc/crio/
+          name: crio-conf
+        - mountPath: /etc/containerd/
+          name: containerd-conf
+        - mountPath: /var/run/dbus
+          name: dbus
+        - mountPath: /run/systemd
+          name: systemd
+      volumes:
+      - hostPath:
+          path: /
+        name: root-mount
+      - configMap:
+          defaultMode: 484
+          name: kontain-install-entrypoint
+        name: entrypoint
+      - configMap:
+          defaultMode: 484
+          name: kontain-install-lib
+        name: lib-entrypoint
+      - hostPath:
+          path: /etc/crio/
+        name: crio-conf
+      - hostPath:
+          path: /etc/containerd/
+        name: containerd-conf
+      - hostPath:
+          path: /var/run/dbus
+        name: dbus
+      - hostPath:
+          path: /run/systemd
+        name: systemd
+  updateStrategy:
+    type: RollingUpdate

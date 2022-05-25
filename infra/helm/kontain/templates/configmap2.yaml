@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  {{- if eq .Values.install_type "kkm" }}
+  kontain_install_lib.sh:  {{ .Values.kkm_install_config.kontain_install_lib | toYaml | indent 4 }}
+  {{- else }}
+  kontain_install_lib.sh:  {{ .Values.km_install_config.kontain_install_lib | toYaml | indent 4 }}
+  {{- end }}
+
+kind: ConfigMap
+metadata:
+  labels:
+    app: kontain-init
+  name: kontain-install-lib
+  namespace: kube-system
