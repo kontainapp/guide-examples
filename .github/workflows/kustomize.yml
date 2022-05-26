@@ -1,0 +1,37 @@
+name: Generate Daemonset Artifact
+on: # push
+  workflow_dispatch: {}
+  # push:
+  #     branches:
+  #       - 'sm/vk8sartifactupdate/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Install tools
+        run: |
+          set -xe
+
+          # install kustomize
+          echo "installing kustomize"
+          sudo curl -Lo /usr/local/bin/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v3.2.3/kustomize_kustomize.v3.2.3_linux_amd64
+          sudo chmod +x /usr/local/bin/kustomize
+
+          sleep 10
+
+          /usr/local/bin/kustomize build /tmp/base/ > /tmp/kustomize_outputs/km.yaml
+          /usr/local/bin/kustomize build /tmp/overlays/km-crio/ > /tmp/kustomize_outputs/km-crio.yaml
+          /usr/local/bin/kustomize build /tmp/overlays/kkm/ > /tmp/kustomize_outputs/kkm.yaml
+          /usr/local/bin/kustomize build /tmp/overlays/k3s/ > /tmp/kustomize_outputs/k3s.yaml
+
+          echo -----------
+          cat /tmp/kustomize_outputs/km.yaml
+          echo -----------
+          cat /tmp/kustomize_outputs/km-crio.yaml
+          echo -----------
+          cat /tmp/kustomize_outputs/kkm.yaml
+          echo -----------
+          cat /tmp/kustomize_outputs/k3s.yaml
