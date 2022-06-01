@@ -1,5 +1,6 @@
 .PHONY: build
 
+
 #----------------------
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
 # Azure VM
@@ -82,14 +83,12 @@ cloudvmaws-ssh:
 build-overlays:
 	mkdir -p ./kustomize_outputs/
 
-	echo "building overlays for km, kkm, km-crio, k3s"
+	echo "building overlays for km, kkm, km-crio"
 	# to apply directly, use:
-	# 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km/cloud/k8s/deploy/kontain-deploy/base?ref=sm/try-v0.9.8" | kubectl apply -f -
-	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/base?ref=sm/try-v0.9.8" > ./kustomize_outputs/km.yaml
-	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/km-crio?ref=sm/try-v0.9.8" > ./kustomize_outputs/km-crio.yaml
-	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/try-v0.9.8" > ./kustomize_outputs/kkm.yaml
-	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/k3s?ref=sm/try-v0.9.8" > ./kustomize_outputs/k3s.yaml
-
+	# 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km/cloud/k8s/deploy/kontain-deploy/base?ref=sm/k8s-kkm-amzn" | kubectl apply -f -
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/base?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/km.yaml
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/km-crio?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/km-crio.yaml
+	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/kkm.yaml
 
 #----------------------
 # kind cluster
@@ -285,27 +284,29 @@ gkecluster-clean:
 # EKS Cluster
 #--------------
 ekscluster:
-	# 1-time task as it takes way too long to create a k8s cluster from scratch in cloudformation (sets up private subnet etc.)
-	echo "setting up 1-node EKS cluster - kdocscluster-eks-2 - using t2.medium instance type"
+	echo "setting up 1-node EKS cluster - kdocscluster-eks - using t2.medium instance type"
 	eksctl create cluster -f conf/aws_eksctl.conf
-	# eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-west-2 --cluster=kdocscluster-eks
 
-ekscluster-add-ng:
-	echo "setting up nodegroup for a 1-node EKS cluster - kdocscluster-eks-2 - using t2.small instance type"
+	# NOTE: can enable logging using below:
+	# 	eksctl utils update-cluster-logging \
+	#		--enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} \
+	#		--region=us-east-1 --cluster=kdocscluster-eks'
 
-	# it takes too long to create a cluster with the huge cloudformation stack generated, hence we will just add a nodegroup
-	eksctl create nodegroup --config-file=./conf/aws/kdocscluster-eks-2.yaml
-
-	# update kubeconfig
-	aws eks update-kubeconfig --region us-west-2 --name "kdocscluster-eks-2"
+	# update local kubeconfig
+	aws eks update-kubeconfig --region us-east-1 --name "kdocscluster-eks"
 	kubectl config current-context
 
 	echo "waiting for all pods to be ready before cluster can be used"
 	kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=720s
 	sleep 10
 
+ekscluster-ng:
+	# providing this as a way to add nodegroups only because it can take too long to create a cluster if VPC not pre-created
+	echo creating nodegroups from config
+	eksctl create nodegroup --config-file=conf/aws_eksctl.conf
+
 ekscluster-apply-kkm:
-	echo "applying kkm to kind cluster: kdocscluster-eks-2"
+	echo "applying kkm to kind cluster: kdocscluster-eks"
 	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
 	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
 	sleep 15
@@ -322,7 +323,7 @@ ekscluster-apply-kkm:
 	cat /tmp/kontain-node-initializer-gke.log
 
 ekscluster-apply-flaskapp:
-	echo "deploying kontain flask app to cluster: kdocscluster-eks-2"
+	echo "deploying kontain flask app to cluster: kdocscluster-eks"
 
 	# cleaning the app in case its already deployed, ignore error if present
 	- kubectl delete -f apps/pyflaskappkontain.yml
@@ -339,25 +340,33 @@ ekscluster-apply-flaskapp:
 	echo "getting pods in default NS"
 	kubectl get po
 
-ekscluster-drain-ng:
-	# takes too long to rebuild cluster hence not doing $ eksctl delete cluster --region=us-west-2 --name=kdocscluster-eks
-	# we will just remove the node group, and scale it down to 0 to remove the nodes, ignore the pod disruption budgets
+ekscluster-clean-ng:
+	# it can too long to rebuild cluster so providing this if needing to test node group creation
 	echo "removing kontain-node-initializer"
 	- kubectl delete deploy/flaskappkontain
 	- kubectl delete daemonset/kontain-node-initializer -n kube-system
-	sleep 5
-	echo "draining the nodegroup to clean: kdocscluster-eks"
-	eksctl drain nodegroup --cluster=kdocscluster-eks-2 --name=kdocscluster-eks-2-ng-1 --disable-eviction
-	eksctl scale nodegroup --cluster=kdocscluster-eks-2 --name=kdocscluster-eks-2-ng-1 --nodes=0
-	eksctl delete nodegroup --cluster=kdocscluster-eks-2 --name=kdocscluster-eks-2-ng-1 --disable-eviction
-	# just to make sure node is removed
-	eksctl delete nodegroup  --config-file=conf/aws/kdocscluster-eks-2.yaml --approve
 
-	- kubectl config delete-context "kdocscluster-eks-2"
+	sleep 5
+
+	echo draining and deleting nodegroups from cluster
+	- eksctl --cluster kdocscluster-eks drain nodegroup kdocscluster-eks-unmanaged-ng
+	- eksctl --cluster kdocscluster-eks delete nodegroup kdocscluster-eks-unmanaged-ng
 
 ekscluster-clean:
-	eksctl delete cluster --name EKS
+	# sometimes this can give an error in cloud formation if stack has not been deleted
+	eksctl delete cluster --name kdocscluster-eks --region us-east-1 --wait
 
+	- kubectl config delete-context "kdocscluster-eks"
+
+eks-list-stacks:
+	# use this to see if stack exists already because 
+	aws cloudformation list-stacks
+
+eks-list-stack-resources:
+	aws cloudformation list-stack-resources --stack-name eksctl-kdocscluster-eks-cluster
+
+eks-delete-stack:
+	aws cloudformation delete-stack --stack-name eksctl-kdocscluster-eks-cluster
 
 #----------------------
 # Kind with KNative
@@ -423,7 +432,7 @@ knativekindcluster-test:
 	echo "deploying hello service to cluster..."
 	- kn service delete hello-kontain
 	# kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
-	kn service create hello-kontain --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
+	# kn service create hello-kontain --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
 
 	sleep 10
 	echo "list services"
@@ -446,3 +455,133 @@ knativekindcluster-clean:
 	sleep 5
 	kind delete clusters knative
 	kind get clusters
+
+
+#----------------------
+# kops
+#----------------------
+AWS_ZONES = "us-east-1f"
+AWS_KOPS_CLUSTER_NAME = "kdocs-cluster.k8s.local"
+AWS_AMI = "ami-0022f774911c1d690"
+AWS_KOPS_INSTANCE_GROUP_NAME = "nodes-us-east-1f"
+KOPS_STATE_STORE = "s3://kontain-kops-state"
+KOPS_STATE_STORE_NAME = "kontain-kops-state"
+AWS_REGION = "us-east-1"
+
+
+kopscluster-create-s3-store:
+	aws  s3api create-bucket --bucket ${KOPS_STATE_STORE_NAME} --region ${AWS_REGION}
+
+kopscluster-config-create:
+	echo installing kops cluster on aws
+	kops create cluster \
+		--cloud aws \
+		${AWS_KOPS_CLUSTER_NAME} \
+		--node-count=1 --zones "${AWS_ZONES}"  \
+		--authorization RBAC \
+		--ssh-public-key ~/.ssh/id_rsa.pub \
+		--master-size t2.small \
+		--master-volume-size 40 \
+		--node-size t3.medium \
+		--node-volume-size 80 \
+		--image ${AWS_AMI} \
+		--state=${KOPS_STATE_STORE}
+
+		# --topology=private \
+		# --networking canal or calico \
+
+kopscluster-build:
+	kops update cluster --name ${AWS_KOPS_CLUSTER_NAME} --yes --state=${KOPS_STATE_STORE}
+	# need to export kubeconfig so we can validate without tne "unauthorized" message popping up
+	kops export kubecfg --admin --state=${KOPS_STATE_STORE}
+
+kopscluster-validate:
+	kops validate cluster --wait 10m --state=${KOPS_STATE_STORE}
+	# kops validate cluster -v10 --logtostderr
+
+kopscluster-clean:
+	kops delete cluster ${AWS_KOPS_CLUSTER_NAME} --yes --state=${KOPS_STATE_STORE}
+
+kopscluster-list:
+	kops get cluster
+
+kopscluster-kubectl-configure:
+	kops export kubecfg --admin --state=${KOPS_STATE_STORE}
+
+kopscluster-edit-ig:
+	kops edit instancegroup ${AWS_KOPS_CLUSTER_NAME} ${AWS_KOPS_INSTANCE_GROUP_NAME} --state=${KOPS_STATE_STORE}
+
+#----------------------
+# KNative on kops cluster
+#----------------------
+kopscluster-knative:
+	# ref: https://knative.dev/docs/install/yaml-install/serving/install-serving-with-yaml/#prerequisites
+
+	# 1. Install the required custom resources by running the command:
+	echo install knative serving component crds
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-crds.yaml
+
+	# 2. Install the core components of Knative Serving by running the command:
+	echo install knative serving core components
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-core.yaml
+
+	# networking layer
+	# 1. Install the Knative Kourier controller by running the command:
+	echo installing kourier controller
+	kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.4.0/kourier.yaml
+
+	# 2. Configure Knative Serving to use Kourier by default by running the command:
+	echo configuring knative serving to use Kourier by default
+	kubectl patch configmap/config-network \
+					--namespace knative-serving \
+					--type merge \
+					--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
+
+	# 3. Fetch the External IP address or CNAME by running the command:
+	echo getting external IP or CNAME
+	kubectl --namespace kourier-system get service kourier
+
+	# 1. Configure DNS to use Magic DNS (sslip.io) so as not use to curl with Host header
+	# Knative provides a Kubernetes Job called default-domain that configures Knative Serving to use sslip.io as the default DNS suffix.
+	echo configuring k8s default-domain job to use magic DNS - sslip.io
+	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-default-domain.yaml
+
+	# 1. verify the install
+	echo verifying the install
+	kubectl get pods -n knative-serving
+
+kopscluster-knative-dns:
+	echo getting public dns/ip for knative/kourier
+	kubectl --namespace kourier-system get service kourier
+
+kopscluster-knative-ssl-enablement:
+	# ref: https://ruzickap.github.io/k8s-knative-gitlab-harbor/part-06/#enable-automatic-tls-certificate-provisioning-for-knative
+	# TODO
+
+kopscluster-knative-test-hello:
+	- kn service delete hello
+	echo deploying go service hello world
+	kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
+
+	sleep 5
+
+	echo checking hello service URL:$$(kn service describe hello -o url)
+	curl $$(kn service describe hello -o url)
+
+	echo removing hello service
+	kn service delete hello
+
+kopscluster-knative-test-hello-kontain:
+	- kn service delete hello-kontain
+	echo deploying go service hello-kontain
+	kn service create hello-kontain --image kontainguide/golang-http-hello:1.0 --port 8080 --env TARGET=World
+
+	sleep 5
+	echo checking hello service URL:$$(kn service describe hello -o url)
+	curl $$(kn service describe hello-kontain -o url)
+
+	echo removing hello-kontain service
+	kn service delete hello-kontain
+
+kopscluster-knative-loadtest-hello-kontain:
+	hey -z 30s -c 50 http://hello-kontain.default.44.205.184.10.sslip.io && kubectl get pods
