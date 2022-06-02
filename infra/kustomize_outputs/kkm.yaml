@@ -7,22 +7,29 @@ data:
     set -euo pipefail
 
     ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
+
+    echo logging the instance this is running on for debugging purposes
+    chroot ${ROOT_MOUNT_DIR} echo running on $(hostname)
+
     CONTAINERD_CFG_DIR="${CONTAINERD_CFG_DIR:-/etc/containerd}"
 
     source /scripts-lib/kontain_install_lib.sh
 
-    echo "Install Kontain Runtime Artifacts (KM & KRUN)"
+    echo "Installing Kontain Runtime Artifacts (KM & KRUN)"
     install_kontain_artifacts
 
     echo "Add Kontain Runtime to containerd configuration"
     # check to see if its a normal k8s distribution or k3s
-    if [ ! -f /root/var/lib/rancher/k3s/agent ]; then
-      echo " its a regular k8s install"
+    if [ -f /etc/containerd/config.toml ]; then
+      echo "its a regular k8s install"
       CONTAINERD_CFG_DIR="${CONTAINERD_CFG_DIR:-/etc/containerd}"
       containerd_conf_file="/etc/containerd/config.toml"
-    else
-      echo " its a k3s install"
-      # else its a k3s containerd install
+    elif [ -f /etc/containerd/config-kops.toml ]; then
+      echo "its a kops cluster install"
+      CONTAINERD_CFG_DIR="${CONTAINERD_CFG_DIR:-/etc/containerd}"
+      containerd_conf_file="${CONTAINERD_CFG_DIR}/config-kops.toml"
+    elif [ -d /root/var/lib/rancher/k3s/agent ]; then
+      echo "its a k3s install"
       CONTAINERD_CFG_DIR="${K3S_CONTAINERD_DIR:/root/var/lib/rancher/k3s/agent/etc/containerd}"
       cp "$CONTAINERD_CFG_DIR/config.toml" "$CONTAINERD_CFG_DIR/config.toml.tmpl"
       containerd_conf_file="$CONTAINERD_CFG_DIR/config.toml.tmpl"
@@ -67,25 +74,31 @@ metadata:
 ---
 apiVersion: v1
 data:
-  kontain_install_lib.sh: |-
+  kontain_install_lib.sh: |
     #!/usr/bin/env bash
-
-    # This will get overridden be ENV definition in kontain-deploy.yaml
     KONTAIN_RELEASE_URL="${KONTAIN_RELEASE_URL:-https://github.com/kontainapp/km/releases/download/v0.9.5/kontain_bin.tar.gz}"
+    echo KONTAIN_RELEASE_URL is: ${KONTAIN_RELEASE_URL}
 
-    # we use chroot here because the host is rooted at /root
-    # and kkm install looks for sudo and dkms in locations on the host
     function install_kontain_artifacts() {
-
       ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 
-      # check to see if deltarpm is installed and if not install it (for Amzn Linux 2)
-      yum -q list installed deltarpm &>/dev/null && echo "deltarpm already installed" || (echo "Not installed"; yum install -y deltarpm)
+      source /$ROOT_MOUNT_DIR/etc/os-release
+      if [[ "$ID" == "amzn" ]]; then 
+        echo we are running this daemonset on ${ID}
+        chroot ${ROOT_MOUNT_DIR} rm /var/lib/rpm/__db*
+        chroot ${ROOT_MOUNT_DIR} yum update -y
+        sleep 2
+        chroot ${ROOT_MOUNT_DIR} yum install  -y kernel-devel-$(uname -r)
+        sleep 2
+        chroot ${ROOT_MOUNT_DIR} ls /lib/modules
+      elif [[ "$ID" == "ubuntu" ]]; then 
+        echo we are running this daemonset on ${ID}
+      fi;
 
       echo "Install Kontain Runtime Artifacts (KM & KRUN)"
 
       mkdir -p ${ROOT_MOUNT_DIR}/kontain-artifacts
-      curl -L "${KONTAIN_RELEASE_URL}" | tar -xzf - -C ${ROOT_MOUNT_DIR}/kontain-artifacts
+      curl -Ls "${KONTAIN_RELEASE_URL}" | tar -xzf - -C ${ROOT_MOUNT_DIR}/kontain-artifacts
 
       mkdir -p ${ROOT_MOUNT_DIR}/opt/kontain/bin
 
@@ -101,7 +114,12 @@ data:
       chroot ${ROOT_MOUNT_DIR} ln -sf /opt/kontain/shim/containerd-shim-krun-v2 /usr/bin/containerd-shim-krun-v2
 
       chmod +x ${ROOT_MOUNT_DIR}/kontain-artifacts/kkm.run
-      chroot ${ROOT_MOUNT_DIR}   /kontain-artifacts/kkm.run -- --force-install
+
+      sleep 2
+      chroot ${ROOT_MOUNT_DIR} /kontain-artifacts/kkm.run -- --force-install
+
+      sleep 2
+      lsmod |grep kkm
     }
 kind: ConfigMap
 metadata:
@@ -135,8 +153,6 @@ spec:
           value: /root
         - name: CONTAINERD_CFG_DIR
           value: /etc/containerd
-        - name: KONTAIN_RELEASE_URL
-          value: https://github.com/kontainapp/km/releases/download/v0.9.8/kontain_bin.tar.gz
         - name: NODE_NAME
           valueFrom:
             fieldRef:

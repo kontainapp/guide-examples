@@ -82,6 +82,7 @@ cloudvmaws-ssh:
 #----------------------
 build-overlays:
 	mkdir -p ./kustomize_outputs/
+	mkdir -p /tmp/kustomize_outputs/
 
 	echo "building overlays for km, kkm, km-crio"
 	# to apply directly, use:
@@ -89,6 +90,8 @@ build-overlays:
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/base?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/km.yaml
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/km-crio?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/km-crio.yaml
 	/usr/local/bin/kustomize build "https://github.com/kontainapp/km//cloud/k8s/deploy/kontain-deploy/overlays/kkm?ref=sm/k8s-kkm-amzn" > /tmp/kustomize_outputs/kkm.yaml
+
+	cp /tmp/kustomize_outputs/k*.yaml ./kustomize_outputs
 
 #----------------------
 # kind cluster
