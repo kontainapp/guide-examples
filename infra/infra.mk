@@ -1,5 +1,16 @@
 .PHONY: build
 
+# used when wanting to rsync (. hidden) files
+#SHELL := bash -O dotglob or extglob
+SHELL := /bin/bash
+
+.EXPORT_ALL_VARIABLES:
+
+# include environment variables file
+ifneq (,$(wildcard ./env.vars))
+    include  env.vars
+    export
+endif
 
 #----------------------
 # instance sizes: https://docs.microsoft.com/en-us/azure/virtual-machines/dv3-dsv3-series
@@ -463,15 +474,6 @@ knativekindcluster-clean:
 #----------------------
 # kops
 #----------------------
-AWS_ZONES = "us-east-1f"
-AWS_KOPS_CLUSTER_NAME = "kdocs-cluster.k8s.local"
-AWS_AMI = "ami-0022f774911c1d690"
-AWS_KOPS_INSTANCE_GROUP_NAME = "nodes-us-east-1f"
-KOPS_STATE_STORE = "s3://kontain-kops-state"
-KOPS_STATE_STORE_NAME = "kontain-kops-state"
-AWS_REGION = "us-east-1"
-
-
 kopscluster-create-s3-store:
 	aws  s3api create-bucket --bucket ${KOPS_STATE_STORE_NAME} --region ${AWS_REGION}
 
@@ -502,6 +504,23 @@ kopscluster-validate:
 	kops validate cluster --wait 10m --state=${KOPS_STATE_STORE}
 	# kops validate cluster -v10 --logtostderr
 
+kopscluster-apply-kkm:
+	echo "applying kkm to kops cluster: kdocscluster-kops"
+	# kubectl apply -f kustomize_outputs/kkm.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
+	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
+	sleep 5
+
+	echo "waiting for kontain-node-initializer to be running and applying KKM"
+	kubectl -n kube-system wait pod --for=condition=Ready -l name=kontain-node-initializer --timeout=240s
+
+	sleep 60
+	echo "saving log output of kontain-node-initiliazer daemonset pod"
+	kubectl logs daemonset/kontain-node-initializer -n kube-system > /tmp/kontain-node-initializer-gke.log
+
+	sleep 15
+	echo "showing output of node-initializer log"
+	cat /tmp/kontain-node-initializer-kops.log
+
 kopscluster-clean:
 	kops delete cluster ${AWS_KOPS_CLUSTER_NAME} --yes --state=${KOPS_STATE_STORE}
 
@@ -509,7 +528,7 @@ kopscluster-list:
 	kops get cluster
 
 kopscluster-kubectl-configure:
-	kops export kubecfg --admin --state=${KOPS_STATE_STORE}
+	kops export kubeconfig ${AWS_KOPS_CLUSTER_NAME} --admin
 
 kopscluster-edit-ig:
 	kops edit instancegroup ${AWS_KOPS_CLUSTER_NAME} ${AWS_KOPS_INSTANCE_GROUP_NAME} --state=${KOPS_STATE_STORE}
