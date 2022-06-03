@@ -562,6 +562,11 @@ kopscluster-knative:
 					--type merge \
 					--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 
+	kubectl patch configmap/config-features \
+		-n knative-serving \
+		--type merge \
+		-p '{"data":{"kubernetes.podspec-runtimeclassname": "enabled"}}'
+
 	# 3. Fetch the External IP address or CNAME by running the command:
 	echo getting external IP or CNAME
 	kubectl --namespace kourier-system get service kourier
