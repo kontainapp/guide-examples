@@ -474,6 +474,10 @@ knativekindcluster-clean:
 #----------------------
 # kops
 #----------------------
+kopscluster-kubectl-configure:
+	# kops export kubeconfig kdocs-cluster.k8s.local --admin --state=s3://kontain-kops-state
+	kops export kubeconfig ${AWS_KOPS_CLUSTER_NAME} --admin
+
 kopscluster-create-s3-store:
 	aws  s3api create-bucket --bucket ${KOPS_STATE_STORE_NAME} --region ${AWS_REGION}
 
@@ -527,11 +531,10 @@ kopscluster-clean:
 kopscluster-list:
 	kops get cluster
 
-kopscluster-kubectl-configure:
-	kops export kubeconfig ${AWS_KOPS_CLUSTER_NAME} --admin
-
 kopscluster-edit-ig:
 	kops edit instancegroup ${AWS_KOPS_CLUSTER_NAME} ${AWS_KOPS_INSTANCE_GROUP_NAME} --state=${KOPS_STATE_STORE}
+
+
 
 #----------------------
 # KNative on kops cluster
