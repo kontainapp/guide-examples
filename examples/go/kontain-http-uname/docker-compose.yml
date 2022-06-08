@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  demo:
+    runtime: krun
+    image: kontainguide/kontain-http-uname:1.0
+    ports:
+      - "8080:8080"
+    environment: 
+      - TARGET="Kontain"
+    deploy:
+      replicas: 1 
