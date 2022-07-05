@@ -3,10 +3,10 @@ This example shows how to build a Java hello world example using a Dockerfile an
 
 
 ```shell
-# to build the example
+# build the example
 $ docker build -t kontainguide/java-hello-world:latest
 
-# to run the example using Kontain
+# run the example using Kontain
 $ docker run --runtime=krun kontainguide/java-hello-world:latest
 Hello world from Kontain!
 
