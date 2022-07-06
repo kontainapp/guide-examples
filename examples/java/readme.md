@@ -7,4 +7,4 @@
 
 [An example of using Kontain to run a Spring Boot REST API example Container with PostgreSQL as the DB and using OpenJDK 11 base image](/examples/java/spring-boot-restapi-mysql/)
 
-[To create an instantly starting Java Spring Boot Container](/examples/java/insta-start-spring-boot/)
+[To create an instantly starting Java Spring Boot Container by using Kontain](/examples/java/insta-start-spring-boot/)
