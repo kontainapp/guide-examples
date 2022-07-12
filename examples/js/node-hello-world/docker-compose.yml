@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  demo:
+    runtime: krun
+    image: kontainguide/node-hello-world:1.0
+    ports:
+      - "3000:3000"
+    deploy:
+      replicas: 1
