@@ -1,6 +1,5 @@
-FROM node:14
+FROM kontainapp/runenv-node
 WORKDIR /usr/src/app
-COPY . .
-RUN npm init -y
-EXPOSE 3000
+COPY app.js /usr/src/app/
+EXPOSE 3000 
 CMD ["node", "app.js"]
