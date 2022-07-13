@@ -1,6 +1,5 @@
 # Description
-This example shows how to build a Javascript NodeJS application using a Dockerfile and run it in Kontain.  This example uses Kontain's nodejs base image.
-
+This example shows how to build a Deno-based Typescript application using a Dockerfile and run it in Kontain.  This example uses Deno.
 
 ```shell
 # build the example
@@ -18,10 +17,10 @@ $ docker push <your-repository/your-image>:<your-image-version>
 Below we show the simple Dockerfile that was used to create the image
 
 ```shell
-FROM node:14
-WORKDIR /usr/src/app
-COPY . .
-RUN npm init -y
-EXPOSE 3000
-CMD ["node", "app.js"]
+FROM denoland/deno:1.23.3 as base
+WORKDIR /app
+COPY . ./
+RUN deno cache server.ts
+EXPOSE 8000
+CMD ["deno", "run", "--allow-net", "server.ts"]
 ```

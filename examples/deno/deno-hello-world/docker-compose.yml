@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  demo:
+    runtime: krun
+    image: kontainguide/deno-hello-world:1.0
+    ports:
+      - "8000:8000"
+    deploy:
+      replicas: 1

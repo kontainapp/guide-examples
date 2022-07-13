@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deno-hello-world
+  labels:
+    app: deno-hello-world
+spec:
+  type: ClusterIP 
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: deno-hello-world
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deno-hello-world
+  labels:
+    app: deno-hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deno-hello-world
+  template:
+    metadata:
+      labels:
+        app: deno-hello-world
+    spec:
+      runtimeClassName: kontain
+      containers:
+      - name: deno-hello-world
+        image: kontainguide/deno-hello-world:1.0
+        ports:
+        - containerPort: 8000
