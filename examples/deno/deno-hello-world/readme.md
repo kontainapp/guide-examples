@@ -13,6 +13,11 @@ EXPOSE 8000
 CMD ["deno", "run", "--allow-net", "server.ts"]
 ```
 
+# to build this example
+```bash
+$ docker build -t kontainguide/deno-hello-world:1.0 .
+```
+
 # to run this example
 ```bash
 $ docker run -d --rm -e "PORT=8000" -p 8000:8000 --runtime=krun --name deno-hello-world kontainguide/deno-hello-world:1.0
