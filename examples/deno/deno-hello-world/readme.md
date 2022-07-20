@@ -1,5 +1,5 @@
 # Description
-This is a Deno Typescript based example of using Kontain to build, push, run a secure Kontain container in Docker and Kubernetes.
+This is a Deno Typescript based example of using Kontain to build, push and deploy a secure Kontain container in Docker, docker-compose and in Kubernetes.
 
 # Dockerfile
 Below we show the simple Dockerfile that was used to create the image
@@ -18,7 +18,7 @@ CMD ["deno", "run", "--allow-net", "server.ts"]
 $ docker build -t kontainguide/deno-hello-world:1.0 .
 ```
 
-# to run this example
+# to run this example in docker
 ```bash
 $ docker run -d --rm -e "PORT=8000" -p 8000:8000 --runtime=krun --name deno-hello-world kontainguide/deno-hello-world:1.0
 
