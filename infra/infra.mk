@@ -297,6 +297,10 @@ gkecluster-clean:
 #--------------
 # EKS Cluster
 #--------------
+# optional in case above creation times out before kubecontext updated
+ekscluster-kubectl-configure:
+	aws eks update-kubeconfig --region us-east-1 --name "kdocscluster-eks"
+
 ekscluster:
 	echo "setting up 1-node EKS cluster - kdocscluster-eks - using t2.medium instance type"
 	eksctl create cluster -f conf/aws_eksctl.conf
@@ -474,15 +478,20 @@ knativekindcluster-clean:
 #----------------------
 # kops
 #----------------------
+# good reference: https://www.patricia-anong.com/blog/2018/8/kubernetes-in-aws-using-kops
+# with DNS: https://blog.kubecost.com/blog/kubernetes-kops/
+#----------------------
 kopscluster-kubectl-configure:
 	# kops export kubeconfig kdocs-cluster.k8s.local --admin --state=s3://kontain-kops-state
-	kops export kubeconfig ${AWS_KOPS_CLUSTER_NAME} --admin
+	kops export kubeconfig ${AWS_KOPS_CLUSTER_NAME} --admin --state=${KOPS_STATE_STORE}
 
 kopscluster-create-s3-store:
 	aws  s3api create-bucket --bucket ${KOPS_STATE_STORE_NAME} --region ${AWS_REGION}
 
 kopscluster-config-create:
-	echo installing kops cluster on aws
+	echo installing kops cluster config on aws
+	
+	# create cluster configuration
 	kops create cluster \
 		--cloud aws \
 		${AWS_KOPS_CLUSTER_NAME} \
@@ -498,11 +507,16 @@ kopscluster-config-create:
 
 		# --topology=private \
 		# --networking canal or calico \
+	
+	# verify that state has been created for cluster
+	kops get cluster
 
 kopscluster-build:
+	echo building the cluster from config
+
 	kops update cluster --name ${AWS_KOPS_CLUSTER_NAME} --yes --state=${KOPS_STATE_STORE}
 	# need to export kubeconfig so we can validate without tne "unauthorized" message popping up
-	kops export kubecfg --admin --state=${KOPS_STATE_STORE}
+	kops export kubeconfig --admin --state=${KOPS_STATE_STORE}
 
 kopscluster-validate:
 	kops validate cluster --wait 10m --state=${KOPS_STATE_STORE}
