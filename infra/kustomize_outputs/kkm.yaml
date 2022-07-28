@@ -8,7 +8,7 @@ data:
 
     ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 
-    echo logging the instance this is running on for debugging purposes
+    echo "logging the instance this is running on for debugging purposes"
     chroot ${ROOT_MOUNT_DIR} echo running on $(hostname)
 
     CONTAINERD_CFG_DIR="${CONTAINERD_CFG_DIR:-/etc/containerd}"
@@ -31,23 +31,23 @@ data:
     elif [ -d /root/var/lib/rancher/k3s/agent ]; then
       echo "its a k3s install"
       CONTAINERD_CFG_DIR="${K3S_CONTAINERD_DIR:/root/var/lib/rancher/k3s/agent/etc/containerd}"
-      cp "$CONTAINERD_CFG_DIR/config.toml" "$CONTAINERD_CFG_DIR/config.toml.tmpl"
-      containerd_conf_file="$CONTAINERD_CFG_DIR/config.toml.tmpl"
+      cp "${CONTAINERD_CFG_DIR}/config.toml" "${CONTAINERD_CFG_DIR}/config.toml.tmpl"
+      containerd_conf_file="${CONTAINERD_CFG_DIR}/config.toml.tmpl"
     fi
 
     runtime="krun"
     configuration="configuration"
     pluginid=cri
-    if grep -q "version = 2\>" $containerd_conf_file; then
+    if grep -q "version = 2\>" ${containerd_conf_file}; then
       pluginid=\"io.containerd.grpc.v1.cri\"
     fi
 
     runtime_table="plugins.${pluginid}.containerd.runtimes.$runtime"
-    runtime_type="io.containerd.$runtime.v2"
-    options_table="$runtime_table.options"
+    runtime_type="io.containerd.${runtime}.v2"
+    options_table="${runtime_table}.options"
     config_path=""
-    if grep -q "\[$runtime_table\]" $containerd_conf_file; then
-        echo "Configuration exists for $runtime_table, overwriting"
+    if grep -q "\[$runtime_table\]" ${containerd_conf_file}; then
+        echo "Configuration exists for ${runtime_table}, overwriting"
         sed -i "/\[$runtime_table\]/,+1s#runtime_type.*#runtime_type = \"${runtime_type}\"#" $containerd_conf_file
     else
         cat <<-EOT | tee -a $containerd_conf_file
@@ -74,26 +74,26 @@ metadata:
 ---
 apiVersion: v1
 data:
-  kontain_install_lib.sh: |
+  kontain_install_lib.sh: |-
     #!/usr/bin/env bash
     TAG=${1:-$(curl -L -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/current_release.txt)}
     KONTAIN_RELEASE_URL="https://github.com/kontainapp/km/releases/download/${TAG}/kontain_bin.tar.gz"
-    echo KONTAIN_RELEASE_URL is: ${KONTAIN_RELEASE_URL}
+    echo "KONTAIN_RELEASE_URL is: ${KONTAIN_RELEASE_URL}"
 
     function install_kontain_artifacts() {
       ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 
       source /$ROOT_MOUNT_DIR/etc/os-release
-      if [[ "$ID" == "amzn" ]]; then 
-        echo we are running this daemonset on ${ID}
+      if [[ "$ID" == "amzn" ]]; then
+        echo "we are running this daemonset on ${ID}"
         chroot ${ROOT_MOUNT_DIR} rm /var/lib/rpm/__db*
         chroot ${ROOT_MOUNT_DIR} yum update -y
         sleep 2
         chroot ${ROOT_MOUNT_DIR} yum install  -y kernel-devel-$(uname -r)
         sleep 2
         chroot ${ROOT_MOUNT_DIR} ls /lib/modules
-      elif [[ "$ID" == "ubuntu" ]]; then 
-        echo we are running this daemonset on ${ID}
+      elif [[ "$ID" == "ubuntu" ]]; then
+        echo "we are running this daemonset on ${ID}"
       fi;
 
       echo "Install Kontain Runtime Artifacts (KM & KRUN)"
