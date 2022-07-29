@@ -3,7 +3,7 @@
 Once you have installed Kontain, and cloned the examples repository, and you are ready to try things out, below are a few quick tips to try out Kontain in Docker, docker-compose and Kubernetes.
 
 ## Using Kontain with Docker hello-world:
-### run the classic docker hello-world program with Kontain as the runtime
+### Run the classic docker hello-world program with Kontain as the runtime
 
 ```shell
 $ docker run --runtime=krun hello-world
