@@ -697,11 +697,12 @@ akscluster-knative-test-hello:
 	kn service delete hello
 
 akscluster-knative-test-hello-kontain:
-	- kn service delete hello-kontain
-	echo deploying spring boot service hello-kontain
+	- kn service delete hello-kontain-spring-boot
+	echo deploying spring boot service hello-kontain-spring-boot
 	# kn service create hello-kontain-sping-boot --image kontainguide/spring-boot-hello:1.0 --port 8080
 	kubectl apply -f ../examples/knative/basics/springboothello-kontain.yml
 
+	sleep 5
 	echo listing pods with Runtime class
 	kubectl get pods -o=custom-columns='NAME:.metadata.name,RUNTIME CLASS:.spec.runtimeClassName,STATUS:.status.phase'
 
@@ -712,6 +713,24 @@ akscluster-knative-test-hello-kontain:
 	echo removing hello-kontain service
 	# kn service delete hello-kontain-spring-boot
 	kubectl delete -f ../examples/knative/basics/springboothello-kontain.yml
+
+	- kn service delete py-flask-hello
+	echo deploying spring boot service py-flask-hello
+	# kn service create py-flask-hello --image kontainguide/spring-boot-hello:1.0 --port 8080
+	kubectl apply -f ../examples/knative/basics/py-flask-hello.yml
+
+	sleep 5
+	echo listing pods with Runtime class
+	kubectl get pods -o=custom-columns='NAME:.metadata.name,RUNTIME CLASS:.spec.runtimeClassName,STATUS:.status.phase'
+
+	sleep 5
+	echo checking hello service URL:$$(kn service describe py-flask-hello -o url)
+	curl $$(kn service describe py-flask-hello -o url)
+
+	echo removing hello-kontain service
+	# kn service delete py-flask-hello
+	kubectl delete -f ../examples/knative/basics/py-flask-hello.yml
+
 
 akscluster-knative-loadtest-hello-kontain:
 	# TODO: for testing automatic scale-up

@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: py-flask-hello
+spec:
+  template:
+    spec:
+      runtimeClassName: kontain
+      containers:
+        - image: kontainguide/py-flask-hello:1.0
+          ports:
+            - containerPort: 5000
