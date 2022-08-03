@@ -118,8 +118,8 @@ test-springboot-hello:
 
 	echo
 	echo "invoking service..."
-	echo Accessing URL at: $$(kn service describe hello-kontain -o url)
-	curl $$(kn service describe hello-kontain -o url)
+	echo Accessing URL at: $$(kn service describe hello-kontain-spring-boot -o url)
+	curl $$(kn service describe hello-kontain-spring-boot -o url)
 
 
 test-springboot-hello-snap:
@@ -134,8 +134,8 @@ test-springboot-hello-snap:
 
 	echo
 	echo "invoking service..."
-	echo Accessing URL at: $$(kn service describe hello-kontain-snap -o url)
-	curl $$(kn service describe hello-kontain-snap -o url)
+	echo Accessing URL at: $$(kn service describe hello-kontain-spring-boot-snap -o url)
+	curl $$(kn service describe hello-kontain-spring-boot-snap -o url)
 
 
 springboot-hello-clean:

@@ -7,7 +7,7 @@ WORKDIR /opt/src/app
 RUN python3 -m venv /opt/venv
 # Make sure we use the virtualenv:
 ENV PATH="/opt/venv/bin:$PATH"
- 
+
 ADD . /opt/src/
 RUN pip install -r /opt/src/requirements.txt
 
@@ -16,7 +16,7 @@ COPY --from=build /opt/venv /opt/venv
 ADD app/main.py /opt/src/app/
 ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /opt/src/app
- 
+
 EXPOSE 5000
 CMD ["python", "main.py"]
 # CMD . /opt/venv/bin/activate && exec python main.py
