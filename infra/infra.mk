@@ -180,24 +180,33 @@ minikubecluster-apply-km:
 
 #----------------------
 # AKS Cluster
+# we use kdocs-cluster-aks as the stable one and kdocs-cluster-aks-dev as the dev one
+# $ make -f infra.mk akscluster AKSCLUSTERNAME="kdocs-cluster-aks" or
+# $ make -f infra.mk akscluster AKSCLUSTERNAME="kdocs-cluster-aks-dev"
 #----------------------
 akscluster:
-	echo "setting up 1-node AKS cluster - kdocscluster-aks - using Dsv3 instance type"
-	# az aks create -g kdocs -n "kdocscluster-aks" --enable-managed-identity --node-count 1 --generate-ssh-keys --node-vm-size Standard_D4s_v3
-	az aks create -g kdocs -n "kdocscluster-aks" --enable-managed-identity --node-count 1 --ssh-key-value ${HOME}/.ssh/cluster-key.pub --node-vm-size Standard_D4s_v3
+ifdef AKSCLUSTERNAME
+		echo "setting up 1-node AKS cluster - ${AKSCLUSTERNAME} - using Dsv3 instance type"
+		# az aks create -g kdocs -n "${AKSCLUSTERNAME}" --enable-managed-identity --node-count 1 --generate-ssh-keys --node-vm-size Standard_D4s_v3
+		az aks create -g kdocs -n "${AKSCLUSTERNAME}" --enable-managed-identity --node-count 1 --ssh-key-value ${HOME}/.ssh/cluster-key.pub --node-vm-size Standard_D4s_v3
 
-	# setup kubectl and its context
-	az aks get-credentials --resource-group kdocs --name "kdocscluster-aks"
-	# - kubectl config set-context "kdocscluster-aks"
-	kubectl config current-context
+		# setup kubectl and its context
+		az aks get-credentials --resource-group kdocs --name "${AKSCLUSTERNAME}"
+		# - kubectl config set-context "${AKSCLUSTERNAME}"
+		kubectl config current-context
 
-	echo "waiting for all pods to be ready before cluster can be used"
-	kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=720s
-	sleep 10
+		echo "waiting for all pods to be ready before cluster can be used"
+		kubectl wait --for=condition=Ready pods --all --all-namespaces --timeout=720s
+		sleep 10
+else
+		@echo 1>&2 "AKSCLUSTERNAME must be set - can be either kdocs-cluster-aks or kdocs-cluster-aks-dev"
+		false # Cause target to fail
+endif
 
 
 akscluster-apply-km:
-	echo "applying km to kind cluster: kdocscluster-aks"
+ifdef AKSCLUSTERNAME
+	echo "applying km to kind cluster: ${AKSCLUSTERNAME}"
 	# kubectl apply -f kustomize_outputs/km.yaml && kubectl rollout status daemonset/kontain-node-initializer -n kube-system --timeout=240s
 	# kubectl apply -f ./kustomize_outputs/km.yaml
 	kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
@@ -215,11 +224,21 @@ akscluster-apply-km:
 	cat /tmp/kontain-node-initializer-aks.log
 
 	sleep 10
+else
+		@echo 1>&2 "AKSCLUSTERNAME must be set - can be either kdocs-cluster-aks or kdocs-cluster-aks-dev"
+		false # Cause target to fail
+endif
 
 akscluster-clean:
+ifdef AKSCLUSTERNAME
 	echo "deleting cluster: kdocscluster_aks"
-	- kubectl config delete-context "kdocscluster-aks"
-	az aks delete -y --name "kdocscluster-aks" --resource-group kdocs
+	- kubectl config delete-context "${AKSCLUSTERNAME}"
+	az aks delete -y --name "${AKSCLUSTERNAME}" --resource-group kdocs
+else
+		@echo 1>&2 "AKSCLUSTERNAME must be set - can be either kdocs-cluster-aks or kdocs-cluster-aks-dev"
+		false # Cause target to fail
+endif
+
 
 #------------------
 # GKE cluster
@@ -551,9 +570,9 @@ kopscluster-edit-ig:
 
 
 #----------------------
-# KNative on kops cluster
+# KNative on k8s cluster
 #----------------------
-kopscluster-knative:
+knative-apply:
 	# ref: https://knative.dev/docs/install/yaml-install/serving/install-serving-with-yaml/#prerequisites
 
 	# 1. Install the required custom resources by running the command:
@@ -594,15 +613,15 @@ kopscluster-knative:
 	echo verifying the install
 	kubectl get pods -n knative-serving
 
-kopscluster-knative-dns:
+knative-dns:
 	echo getting public dns/ip for knative/kourier
 	kubectl --namespace kourier-system get service kourier
 
-kopscluster-knative-ssl-enablement:
+knative-ssl-enablement:
 	# ref: https://ruzickap.github.io/k8s-knative-gitlab-harbor/part-06/#enable-automatic-tls-certificate-provisioning-for-knative
 	# TODO
 
-kopscluster-knative-test-hello:
+knative-test-hello:
 	- kn service delete hello
 	echo deploying go service hello world
 	kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
@@ -615,7 +634,7 @@ kopscluster-knative-test-hello:
 	echo removing hello service
 	kn service delete hello
 
-kopscluster-knative-test-hello-kontain:
+knative-test-hello-kontain:
 	- kn service delete hello-kontain
 	echo deploying go service hello-kontain
 	kn service create hello-kontain --image kontainguide/golang-http-hello:1.0 --port 8080 --env TARGET=World
@@ -627,111 +646,5 @@ kopscluster-knative-test-hello-kontain:
 	echo removing hello-kontain service
 	kn service delete hello-kontain
 
-kopscluster-knative-loadtest-hello-kontain:
+knative-loadtest-hello-kontain:
 	hey -z 30s -c 50 http://hello-kontain.default.44.205.184.10.sslip.io && kubectl get pods
-
-#----------------------------------
-# KNative on Azure AKS cluster
-#----------------------------------
-akscluster-knative:
-	# ref: https://knative.dev/docs/install/yaml-install/serving/install-serving-with-yaml/#prerequisites
-
-	# 1. Install the required custom resources by running the command:
-	echo install knative serving component crds
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-crds.yaml
-
-	# 2. Install the core components of Knative Serving by running the command:
-	echo install knative serving core components
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-core.yaml
-
-	# networking layer
-	# 1. Install the Knative Kourier controller by running the command:
-	echo installing kourier controller
-	kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.4.0/kourier.yaml
-
-	# 2. Configure Knative Serving to use Kourier by default by running the command:
-	echo configuring knative serving to use Kourier by default
-	kubectl patch configmap/config-network \
-					--namespace knative-serving \
-					--type merge \
-					--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
-
-	kubectl patch configmap/config-features \
-		-n knative-serving \
-		--type merge \
-		-p '{"data":{"kubernetes.podspec-runtimeclassname": "enabled"}}'
-
-	# 3. Fetch the External IP address or CNAME by running the command:
-	echo getting external IP or CNAME
-	kubectl --namespace kourier-system get service kourier
-
-	# 1. Configure DNS to use Magic DNS (sslip.io) so as not use to curl with Host header
-	# Knative provides a Kubernetes Job called default-domain that configures Knative Serving to use sslip.io as the default DNS suffix.
-	echo configuring k8s default-domain job to use magic DNS - sslip.io
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-default-domain.yaml
-
-	# 1. verify the install
-	echo verifying the install
-	kubectl get pods -n knative-serving
-
-akscluster-knative-dns:
-	echo getting public dns/ip for knative/kourier
-	kubectl --namespace kourier-system get service kourier
-
-
-akscluster-knative-ssl-enablement:
-	# ref: https://ruzickap.github.io/k8s-knative-gitlab-harbor/part-06/#enable-automatic-tls-certificate-provisioning-for-knative
-	# TODO
-
-akscluster-knative-test-hello:
-	- kn service delete hello
-	echo deploying go service hello world
-	kn service create hello --image gcr.io/knative-samples/helloworld-go --port 8080 --env TARGET=World
-
-	sleep 5
-
-	echo checking hello service URL:$$(kn service describe hello -o url)
-	curl $$(kn service describe hello -o url)
-
-	echo removing hello service
-	kn service delete hello
-
-akscluster-knative-test-hello-kontain:
-	- kn service delete hello-kontain-spring-boot
-	echo deploying spring boot service hello-kontain-spring-boot
-	# kn service create hello-kontain-sping-boot --image kontainguide/spring-boot-hello:1.0 --port 8080
-	kubectl apply -f ../examples/knative/basics/springboothello-kontain.yml
-
-	sleep 5
-	echo listing pods with Runtime class
-	kubectl get pods -o=custom-columns='NAME:.metadata.name,RUNTIME CLASS:.spec.runtimeClassName,STATUS:.status.phase'
-
-	sleep 5
-	echo checking hello service URL:$$(kn service describe hello-kontain-spring-boot -o url)
-	curl $$(kn service describe hello-kontain-spring-boot -o url)
-
-	echo removing hello-kontain service
-	# kn service delete hello-kontain-spring-boot
-	kubectl delete -f ../examples/knative/basics/springboothello-kontain.yml
-
-	- kn service delete py-flask-hello
-	echo deploying spring boot service py-flask-hello
-	# kn service create py-flask-hello --image kontainguide/spring-boot-hello:1.0 --port 8080
-	kubectl apply -f ../examples/knative/basics/py-flask-hello.yml
-
-	sleep 5
-	echo listing pods with Runtime class
-	kubectl get pods -o=custom-columns='NAME:.metadata.name,RUNTIME CLASS:.spec.runtimeClassName,STATUS:.status.phase'
-
-	sleep 5
-	echo checking hello service URL:$$(kn service describe py-flask-hello -o url)
-	curl $$(kn service describe py-flask-hello -o url)
-
-	echo removing hello-kontain service
-	# kn service delete py-flask-hello
-	kubectl delete -f ../examples/knative/basics/py-flask-hello.yml
-
-
-akscluster-knative-loadtest-hello-kontain:
-	# TODO: for testing automatic scale-up
-	hey -z 30s -c 50 http://hello-kontain-spring-boot.default.44.205.184.10.sslip.io && kubectl get pods
