@@ -179,10 +179,14 @@ minikubecluster-apply-km:
 	sleep 5
 
 #----------------------
+#
 # AKS Cluster
 # we use kdocs-cluster-aks as the stable one and kdocs-cluster-aks-dev as the dev one
 # $ make -f infra.mk akscluster AKSCLUSTERNAME="kdocs-cluster-aks" or
 # $ make -f infra.mk akscluster AKSCLUSTERNAME="kdocs-cluster-aks-dev"
+# $ make -f infra.mk akscluster AKSCLUSTERNAME="aks-kontain-trial"
+# for kubectl:
+# $ az aks get-credentials --resource-group kdocs --name "${AKSCLUSTERNAME}"
 #----------------------
 akscluster:
 ifdef AKSCLUSTERNAME
