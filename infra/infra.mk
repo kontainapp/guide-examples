@@ -187,6 +187,11 @@ minikubecluster-apply-km:
 # $ make -f infra.mk akscluster AKSCLUSTERNAME="aks-kontain-trial"
 # for kubectl:
 # $ az aks get-credentials --resource-group kdocs --name "${AKSCLUSTERNAME}"
+
+# az aks get-credentials --resource-group kdocs --name "aks-kontain-trial"
+
+# az aks get-credentials --resource-group kdocs --name "kdocs-cluster-aks"
+# az aks get-credentials --resource-group kdocs --name "kdocs-cluster-aks-dev"
 #----------------------
 akscluster:
 ifdef AKSCLUSTERNAME
