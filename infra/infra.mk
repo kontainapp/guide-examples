@@ -586,41 +586,55 @@ knative-apply:
 
 	# 1. Install the required custom resources by running the command:
 	echo install knative serving component crds
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-crds.yaml
+	k3s kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.6.0/serving-crds.yaml
+
+	sleep 5
 
 	# 2. Install the core components of Knative Serving by running the command:
 	echo install knative serving core components
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-core.yaml
+	k3s kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.6.0/serving-core.yaml
+
+	k3s kubectl wait --for=condition=Ready pods --all -n knative-serving
+	sleep 5
 
 	# networking layer
 	# 1. Install the Knative Kourier controller by running the command:
 	echo installing kourier controller
-	kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.4.0/kourier.yaml
+	k3s kubectl apply -f https://github.com/knative/net-kourier/releases/download/knative-v1.6.0/kourier.yaml
+
+	k3s kubectl wait --for=condition=Ready pods --all -n knative-serving
+	sleep 5
 
 	# 2. Configure Knative Serving to use Kourier by default by running the command:
 	echo configuring knative serving to use Kourier by default
-	kubectl patch configmap/config-network \
+	k3s kubectl patch configmap/config-network \
 					--namespace knative-serving \
 					--type merge \
 					--patch '{"data":{"ingress-class":"kourier.ingress.networking.knative.dev"}}'
 
-	kubectl patch configmap/config-features \
+	sleep 5
+
+	k3s kubectl patch configmap/config-features \
 		-n knative-serving \
 		--type merge \
 		-p '{"data":{"kubernetes.podspec-runtimeclassname": "enabled"}}'
+	sleep 5
 
 	# 3. Fetch the External IP address or CNAME by running the command:
 	echo getting external IP or CNAME
-	kubectl --namespace kourier-system get service kourier
+	k3s kubectl --namespace kourier-system get service kourier
 
 	# 1. Configure DNS to use Magic DNS (sslip.io) so as not use to curl with Host header
 	# Knative provides a Kubernetes Job called default-domain that configures Knative Serving to use sslip.io as the default DNS suffix.
-	echo configuring k8s default-domain job to use magic DNS - sslip.io
-	kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.4.0/serving-default-domain.yaml
+	# echo configuring k8s default-domain job to use magic DNS - sslip.io
+	k3s kubectl apply -f https://github.com/knative/serving/releases/download/knative-v1.6.0/serving-default-domain.yaml
 
-	# 1. verify the install
-	echo verifying the install
-	kubectl get pods -n knative-serving
+	echo waiting for pods to become ready
+	k3s kubectl rollout status deployment domain-mapping -n knative-serving
+
+	echo list the pods
+	k3s kubectl get pods -n knative-serving
+
 
 knative-dns:
 	echo getting public dns/ip for knative/kourier
