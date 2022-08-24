@@ -69,7 +69,6 @@ data:
   kontain_install_lib.sh: |-
     #!/usr/bin/env bash
     TAG=${1:-$(curl -L -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/current_release.txt)}
-    TAG="v0.9.8"
     KONTAIN_RELEASE_URL="https://github.com/kontainapp/km/releases/download/${TAG}/kontain_bin.tar.gz"
 
     function install_kontain_artifacts() {
