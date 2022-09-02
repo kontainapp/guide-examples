@@ -221,7 +221,7 @@ echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
 echo "mongodb-org-tools hold" | sudo dpkg --set-selections
 
 # to start use:
-# sudo systemctl enable mongod
+sudo systemctl enable mongod
 # optional - sudo systemctl daemon-reload
 # sudo systemctl start mongod
 # sudo systemctl status mongod
