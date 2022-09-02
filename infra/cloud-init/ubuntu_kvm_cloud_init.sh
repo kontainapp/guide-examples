@@ -200,3 +200,36 @@ curl -s https://raw.githubusercontent.com/kontainapp/km/current/km-releases/kont
 # clone Kontain examples
 cd /home/azure-user
 runuser -l azure-user -c 'git clone https://github.com/kontainapp/guide-examples.git'
+
+#---------------------------------
+# install mongodb
+# ref: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+sudo apt-get install gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+sudo apt-get update
+
+sudo apt-get install -y mongodb-org
+
+# to prevent unwanted upgrades by apt-get
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-database hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-mongosh hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+
+# to start use:
+# sudo systemctl enable mongod
+# optional - sudo systemctl daemon-reload
+# sudo systemctl start mongod
+# sudo systemctl status mongod
+# optional - sudo systemctl restart mongod
+# mongosh
+#
+# to remove DB and log files:
+# sudo apt-get purge mongodb-org*
+# sudo rm -r /var/log/mongodb
+# sudo rm -r /var/lib/mongodb
+

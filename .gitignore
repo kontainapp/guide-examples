@@ -4,6 +4,8 @@ kmsnap*
 # general
 #-------------
 .DS_Store
+km_cli
+kmsnap
 node_modules
 build
 npm-debug.log
