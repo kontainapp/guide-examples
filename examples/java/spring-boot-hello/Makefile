@@ -27,8 +27,8 @@ build:
 	echo
 	echo "building spring-boot-hello..."
 	mvn clean compile package -Dmaven.test.skip # test
-	docker build --build-arg OPEN_JDK_BUILD_VERSION=${OPEN_JDK_BUILD_VERSION} --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=${OPEN_JDK_KONTAIN_RELEASE_VERSION}  -t ${IMAGE_NAME}:1.0 .
-	docker tag ${IMAGE_NAME}:1.0 ${IMAGE_NAME}:latest
+	docker build --build-arg OPEN_JDK_BUILD_VERSION=${OPEN_JDK_BUILD_VERSION} --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=${OPEN_JDK_KONTAIN_RELEASE_VERSION}  -t ${IMAGE_NAME}:latest .
+	docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:1.0
 
 jib-build:
 	echo
@@ -36,13 +36,14 @@ jib-build:
 	mvn clean compile package jib:build -Djib.to.image=${IMAGE_NAME}:1.0 -Dmaven.test.skip
 
 push:
-	docker push ${IMAGE_NAME}:1.0
 	docker push ${IMAGE_NAME}:latest
+	docker push ${IMAGE_NAME}:1.0
 	
 
 test:
 	echo "testing spring-boot-hello..."
 	- docker stop spring-boot-hello
+	- docker rm spring-boot-hello
 	docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-hello ${IMAGE_NAME}:1.0
 	sleep 30
 	curl -v http://localhost:8080

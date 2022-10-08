@@ -1,7 +1,7 @@
 FROM node:12 as build
 
 # Create app directory
-WORKDIR /opt/src/app
+WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -16,8 +16,8 @@ RUN npm install
 COPY . .
 
 FROM kontainapp/runenv-node as release
-COPY --from=build /opt/src /opt/src
-WORKDIR /opt/src/app
+COPY --from=build /app /app
+WORKDIR /app
 
 EXPOSE 8080
 CMD [ "node", "server.js" ]

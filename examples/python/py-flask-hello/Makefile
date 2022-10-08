@@ -39,6 +39,7 @@ push:
 test:
 	echo "testing py-flask-hello..."
 	- docker stop py-flask-hello
+	- docker rm py-flask-hello
 	sleep 2
 	docker run -d --rm -p 5000:5000 --runtime=krun --name py-flask-hello ${IMAGE_NAME}:1.0
 	sleep 15

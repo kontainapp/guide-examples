@@ -38,6 +38,7 @@ push:
 test:
 	echo "testing fastapi-hello..."
 	- docker stop fastapi-hello
+	- docker rm fastapi-hello
 	sleep 2
 	docker run -d --rm -p 8080:8080 --runtime=krun --name fastapi-hello ${IMAGE_NAME}:1.0
 	sleep 15
