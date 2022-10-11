@@ -27,17 +27,6 @@ clouddevvmazure-up:
 	--custom-data ./cloud-init/ubuntu_kvm_cloud_init.sh
 	sleep 20
 
-cloudvmazure-up:
-	az vm create \
-	--name trial_vm1 \
-	--resource-group kdocs \
-	--size Standard_D4s_v3 \
-	--image "Canonical:0001-com-ubuntu-confidential-vm-focal:20_04-lts-gen2:20.04.202110290" \
-	--ssh-key-name sm-key \
-	--admin-username azure-user \
-	--custom-data ./cloud-init/ubuntu_kvm_cloud_init.sh
-	sleep 20
-
 cloudvmazure-clean:
 	az vm delete --resource-group kdocs --name trial_vm1 --yes
 	sleep 10

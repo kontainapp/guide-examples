@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  demo:
+    runtime: krun
+    image: kontainguide/spring-boot-products:1.0
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1 

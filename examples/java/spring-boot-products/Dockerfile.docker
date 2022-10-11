@@ -1,0 +1,8 @@
+FROM openjdk:11-jdk-slim-buster as build
+# RUN mkdir -p /tmp
+WORKDIR /opt/src/app
+
+# copy jar
+COPY target/spring-boot-products-1.0.jar app.jar
+
+CMD [ "java", "-XX:-UseCompressedOops", "-jar", "/opt/src/app/app.jar" ]

@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: py-students-api
+  labels:
+    app: py-students-api
+spec:
+  type: ClusterIP 
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+  selector:
+    app: py-students-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: py-students-api
+  labels:
+    app: py-students-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: py-students-api
+  template:
+    metadata:
+      labels:
+        app: py-students-api
+    spec:
+      runtimeClassName: kontain
+      containers:
+      - name: py-students-api
+        image: kontainguide/py-students-api:1.0
+        ports:
+        - containerPort: 5000
