@@ -3,7 +3,7 @@ version: "3.7"
 services:
   demo:
     runtime: krun
-    image: kontainguide/blog-posts-api:1.0
+    image: kontainguide/node-blog-posts-api:1.0
     ports:
       - "8080:8080"
     deploy:
