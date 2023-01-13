@@ -1,4 +1,0 @@
-IMAGE_NAME:="kontainguide/spring-boot-hello"
-push:
-	docker push {{IMAGE_NAME}}:1.0
-	docker push {{IMAGE_NAME}}:latest

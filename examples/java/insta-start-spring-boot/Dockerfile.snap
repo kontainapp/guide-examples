@@ -1,6 +1,0 @@
-FROM kontainguide/insta-start-spring-boot
-ARG TARGET_SNAP=kmsnap
-COPY ${TARGET_SNAP} /kmsnap
-EXPOSE 8080/tcp
-ENV KM_MGTPIPE=/tmp/km.snap_sock
-CMD ["/kmsnap"]
