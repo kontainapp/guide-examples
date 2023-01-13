@@ -12,11 +12,10 @@ Please note the pre-requisites above for trying this out on a desktop or Cloud V
 
 For example, you can install on Minikube using the instruction below on a desktop that meets the requirements above.
 
-Install Kontain using a Daemonset
-```bash
-# apply the daemonset
-$ kubectl apply -f curl https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km.yaml
-```
+Please refer to this page for installing Kontain in Kubernetes (or in AWS AKS, Google Cloud GKE, Azure AKS, K3s, Openshift):
+
+[!Install in Kubernetes](https://github.com/kontainapp/guide-examples/tree/master/install_in_kubernetes)
+
 
 ## Post install steps
 ```bash
@@ -37,40 +36,3 @@ $ kubectl logs kontain-node-initializer-<id>
 # check the daemonset state
 $ kubectl get daemonsets.apps -A
 ```
-
-# To install Kontain on Azure AKS
-The above instructions work well for Azure AKS that is run with a minimum instance being Standard_D4s_v3.
-
-This is because this enables nested virtualization by default on that worker node to be able to utilize the power Kontain's virtualization fully.
-
-# To install Kontain on AWS and GKE
-To install Kontain on AWS (with containerd) or GKE use:
-
-```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
-```
-
-The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
-
-As Docker shim is being deprecated in AWS EKS, please note that to use Kontain on AWS EKS, you will need to launch the cluster using containerd as the default runtime. Please see: Docker shim deprecation
-
-To enable containerd as default rutime, please see: Enabling Containerd in EKS
-
-# K3s
-To install Kontain on K3s:
-
-```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/kkm.yaml
-```
-
-The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
-
-
-# Openshift with CRIO
-To install Kontain on Openshift with CRIO:
-
-```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kontainapp/guide-examples/master/infra/kustomize_outputs/km-crio.yaml
-```
-
-The above installs the Kontain runtime class and contains the libraries for installing Kontain using the daemonset.
