@@ -8,11 +8,11 @@ For enabling KVM on Ubuntu 18.04 or higher, you can refer to this [article](http
 Recommended distros are Ubuntu 20.04 and Fedora 32, or newer. Note that this also assumes that your user has access to /dev/kvm.
 
 # Install in Kubernetes
-Please note the pre-requisites above for trying this out on a desktop or Cloud VM.
+Please note the pre-requisites above for trying out Kontain on Kubernetes node.
 
-For example, you can install on Minikube using the instruction below on a desktop that meets the requirements above.
+For example, you can install on Minikube or k3s using the instructions below on a desktop that meets the requirements above.
 
-Please refer to this page for installing Kontain in Kubernetes (or in AWS AKS, Google Cloud GKE, Azure AKS, K3s, Openshift):
+Please refer to this page for installing Kontain in any version of Kubernetes (for example - AWS AKS, Google Cloud GKE, Azure AKS, K3s, Openshift):
 
 [!Install in Kubernetes](https://github.com/kontainapp/guide-examples/tree/master/install_in_kubernetes)
 
