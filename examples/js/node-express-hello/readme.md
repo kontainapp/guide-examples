@@ -8,11 +8,19 @@ $ docker build -t kontainguide/node-express-hello:1.0 .
 
 # see image sizes
 ```bash
-$ docker images | grep -E 'spring|jdk'
+# just for comparison purposes, build the docker-based image as well
+$ docker build -f Dockerfile.docker -t kontainguide/node-express-hello-docker .
+
+# now see image sizes
+$ docker images | grep -E 'node|express'
 ...
-kontainguide/node-express-hello    1.0     84.2MB
-kontainapp/runenv-node             latest  81.3MB
-node                               12      918MB  
+...
+kontainguide/node-express-hello-docker latest   922MB
+kontainguide/node-express-hello        1.0      84.2MB
+kontainguide/node-express-hello        latest   84.2MB
+kontainapp/runenv-node                 latest   81.3MB
+node                                   12       918MB
+...
 ...
 ```
 
@@ -24,6 +32,7 @@ $ docker run -d --rm -p 8080:8080 --runtime=krun --name node-express-hello konta
 
 # invoke the service
 $ curl -v http://localhost:8080
+{"message":"Hello from Kontain!"}
 
 $ docker stop node-express-hello
 ```
@@ -34,6 +43,7 @@ $ docker-compose up -d
 
 # invoke the service
 $ curl -v http://localhost:8080
+{"message":"Hello from Kontain!"}
 
 # shut down compose
 $ docker-compose down
@@ -51,6 +61,7 @@ $ kubectl port-forward svc/node-express-hello 8080:8080 2>/dev/null &
 
 # invoke the service
 $ curl -v http://localhost:8080
+{"message":"Hello from Kontain!"}
 
 # kill the port-forward
 $ pkill -f "port-forward"

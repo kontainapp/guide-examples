@@ -8,7 +8,7 @@ public class HelloController {
 
     @RequestMapping("/")
     String hello() {
-        return "Hello from Kontain!";
+        return "{\"message\":\"Hello from Kontain!\"}";
     }
 
 }

@@ -18,7 +18,7 @@ public class HelloControllerTest {
     @Test
     public void hello_ok() throws Exception {
         ResponseEntity<String> response = template.getForEntity("/", String.class);
-        assertThat(response.getBody()).isEqualTo("Hello from Kontain!");
+        assertThat(response.getBody()).isEqualTo("{\"message\":\"Hello from Kontain!\"}");
     }
 
 }

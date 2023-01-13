@@ -12,7 +12,6 @@ push:
 	docker push kontainguide/node-blog-posts-api:1.0
 	docker push kontainguide/node-blog-posts-api:latest
 
-
 test:
 	echo "testing node-blog-posts-api..."
 	- docker stop node-blog-posts-api
