@@ -10,11 +10,11 @@ $ docker build -t kontainguide/fastapi-hello:1.0 .
 
 # to run this example
 ```bash
-$ docker run -d --rm -p 5000:5000 --runtime=krun --name fastapi-hello kontainguide/fastapi-hello:1.0
+$ docker run -d --rm -p 8080:8080 --runtime=krun --name fastapi-hello kontainguide/fastapi-hello:1.0
 ```
 
 # invoke the service
-$ curl -v http://localhost:5000
+$ curl -v http://localhost:8080
 
 $ docker stop fastapi-hello
 ```
@@ -38,7 +38,7 @@ $ kubectl apply -f k8s.yml
 $ kubectl get pods -w
 
 # port-forward the port
-$ kubectl port-forward svc/fastapi-hello 5000:5000 2>/dev/null &
+$ kubectl port-forward svc/fastapi-hello 8080:8080 2>/dev/null &
 
 # invoke the service
 $ curl -vvv http://localhost:8080

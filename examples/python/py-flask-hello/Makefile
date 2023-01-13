@@ -29,7 +29,7 @@ build:
 	echo "building py-flask-hello..."
 
 	# read the image versions from env file and pass as build args
-	docker build --build-arg PYTHON_BUILD_IMAGE_VERSION=${PYTHON_BUILD_IMAGE_VERSION} --build-arg PYTHON_KONTAIN_RELEASE_IMAGE_VERSION=${PYTHON_KONTAIN_RELEASE_IMAGE_VERSION} -t ${IMAGE_NAME}:1.0 .
+	docker build -t ${IMAGE_NAME}:1.0 .
 	docker tag ${IMAGE_NAME}:1.0 ${IMAGE_NAME}:latest
 
 push:

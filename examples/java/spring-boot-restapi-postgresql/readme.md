@@ -1,26 +1,57 @@
 # Description
-This shows how to run a Spring Boot Rest API Container with Postgresql as the backing DB.  The DB gets initialized automatically with products and the test queries the API for a list of products.
+This shows how to create, build, push and run a simple Spring Boot based Container with Kontain in Docker and Kubernetes.
 
-Note that we use runtime:krun in the docker-compose file to show that we use Kontain as the secure Docker runtime.
-
-Also note that we continued to use a normal JIB created Dockerfile for this exercise, and shows us how to experience Kontain with existing Dockerfiles and images but without the benefit of smaller image sizes.
-
-# to build
-```shell
-$ mvn clean compile package -D jib:dockerBuild -Djib.to.image=kontainguide/spring-boot-restapi-postgresql:v1 -Dmaven.test.skip
+# to build this example
+```bash
+$ mvn clean compile package -Dmaven.test.skip
+$ docker build -t kontainguide/spring-boot-restapi-postgresql:1.0 .
 ```
 
-# run
-```shell
+Out of curiousity to see image sizes, let's build the plain Docker image:
+```bash
+$ docker build -t kontainguide/spring-boot-restapi-postgresql-docker:1.0 -f Dockerfile.docker .
+```
+
+# see image sizes
+```bash
+$ docker images | grep -E 'postgres|jdk'
+...
+openjdk                                11-jdk-slim-buster  422MB
+kontainapp/runenv-jdk-shell-11.0.8     latest              179MB
+kontainguide/spring-boot-restapi-postgresql         1.0                 228MB
+kontainguide/spring-boot-restapi-postgresql-docker  1.0                 702MB
+...
+
+```
+
+**Please note the image size of the base container at 702MB and that of the Kontain container at 228MB.**
+
+# to run this example
+```bash
+# in terminal 1 (Ctrl-C to stop)
 $ docker-compose up
+
+# invoke the service in another terminal
+$ curl http://localhost:8080/api/v1/products
+[{"id":1,"name":"Skates","quantity":10,"price":1000.0},{"id":2,"name":"Skiis","quantity":20,"price":2000.0},{"id":3,"name":"Tennis Racquet","quantity":30,"price":3000.0},{"id":3,"name":"Shoes","quantity":40,"price":4000.0},{"id":3,"name":"Socks","quantity":50,"price":5000.0},{"id":3,"name":"Trees","quantity":60,"price":6000.0},{"id":3,"name":"Plants","quantity":70,"price":7000.0},{"id":3,"name":"PCs","quantity":80,"price":8000.0},{"id":3,"name":"Hoses","quantity":90,"price":9000.0},{"id":3,"name":"Tables","quantity":10,"price":1000.0},{"id":3,"name":"Chairs","quantity":20,"price":2000.0},{"id":3,"name":"TVs","quantity":30,"price":3000.0},{"id":3,"name":"Couches","quantity":40,"price":4000.0},{"id":3,"name":"Carpets","quantity":50,"price":5000.0}]
 ```
 
-# test
-to test the API from terminal 2:
-```shell
+# to run the Spring Boot image in kubernetes (assuming you give it access to PostgresQL running outside of Kubernetes)
+```bash
+$ kubectl apply -f k8s.yml
+
+# check that the pod is ready
+$ kubectl get pods -w
+
+# port-forward the port
+$ kubectl port-forward svc/spring-boot-hello 8080:8080 2>/dev/null &
+
+# invoke the service
 $ curl http://localhost:8080/api/v1/products
-[{"name":"Monster Tulpar T7 V20.4 Dizüstü Bilgisayar","description":"Monster Tulpar T7 V20.4 Dizüstü Bilgisayar","price":17.099,"category":"Dizüstü Bilgisayar"},{"name":"HP Pavilion Gaming 15-ec2033nt 4G8U0EA Dizüstü Bilgisayar","description":"HP Pavilion Gaming 15-ec2033nt 4G8U0EA Dizüstü Bilgisayar","price":10.199,"category":"Dizüstü Bilgisayar"},{"name":"Apple MacBook Air 13.3 İnç M1 MGN73TU/A Dizüstü Bilgisayar","description":"Apple MacBook Air 13.3 İnç M1 MGN73TU/A Dizüstü Bilgisayar","price":12.396,"category":"Dizüstü Bilgisayar"}]azure-user@smdev1:~/guide-examples/examples/java/spring-boot-postgresql$
-````
+
+# to kill the port-forward
+$ pkill -f "port-forward"
+```
 
 # reference
 An example sourced from this blog:

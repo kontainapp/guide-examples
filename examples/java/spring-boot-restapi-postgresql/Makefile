@@ -26,8 +26,17 @@ IMAGE_NAME="kontainguide/spring-boot-restapi-postgresql"
 build:
 	echo
 	echo "building spring-boot-restapi-postgresql:1.0 image using Jib..."
-	mvn clean compile package -D jib:dockerBuild -Djib.to.image=kontainguide/spring-boot-restapi-postgresql:v1 -Dmaven.test.skip
+	mvn clean compile package -Dmaven.test.skip
+	docker build -t ${IMAGE_NAME}:1.0 .
 	docker tag ${IMAGE_NAME}:1.0 ${IMAGE_NAME}:latest
+
+run:
+	# running with compose here as we need the postgresql DB to be up and running as well 
+	# mvn spring-boot:run
+	# use following to test
+	# curl http://localhost:8080/api/v1/products
+	docker-compose up
+
 
 jib-build:
 	echo
@@ -38,16 +47,15 @@ push:
 	docker push ${IMAGE_NAME}:1.0
 	docker push ${IMAGE_NAME}:latest
 	
-
 test:
 	echo "testing spring-boot-restapi-postgresql..."
 	- docker stop spring-boot-restapi-postgresql
-	docker run -d --rm -p 8080:8080 --runtime=krun --name spring-boot-restapi-postgresql ${IMAGE_NAME}:1.0
+	docker-compose up -d
 	sleep 30
-	curl -v http://localhost:8080
+	curl http://localhost:8080/api/v1/products
 	echo
 	sleep 5
-	docker stop spring-boot-restapi-postgresql
+	docker-compose down --remove-orphans
 	sleep 10
 
 clean:
@@ -60,7 +68,7 @@ testcompose:
 	echo "running docker-compose"
 	docker-compose up -d
 	sleep 30
-	curl -vvv http://localhost:8080
+	curl http://localhost:8080/api/v1/products
 	echo
 	sleep 5
 	docker-compose down --remove-orphans
@@ -68,7 +76,7 @@ testcompose:
 
 deployk8s:
 	echo
-	echo "deploying spring-boot-restapi-postgresql to cluster kind..."
+	echo "deploying spring-boot-restapi-postgresql to cluster...assuming with access to postgresql"
 	kubectl apply -f k8s.yml
 	sleep 10
 	kubectl -n default wait pod --for=condition=Ready -l app=spring-boot-restapi-postgresql --timeout=240s
@@ -76,10 +84,10 @@ deployk8s:
 
 testk8s:
 	echo
-	echo "testing spring-boot-restapi-postgresql..."
+	echo "testing spring-boot-restapi-postgresql...assuming with access to postgresql"
 	kubectl port-forward svc/spring-boot-restapi-postgresql 8080:8080 2>/dev/null &
 	sleep 20
-	curl -vvv http://localhost:8080
+	curl http://localhost:8080/api/v1/products
 	echo
 	sleep 5
 	- pkill -f "port-forward"

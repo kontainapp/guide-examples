@@ -27,8 +27,12 @@ build:
 	echo
 	echo "building spring-boot-hello..."
 	mvn clean compile package -Dmaven.test.skip # test
-	docker build --build-arg OPEN_JDK_BUILD_VERSION=${OPEN_JDK_BUILD_VERSION} --build-arg OPEN_JDK_KONTAIN_RELEASE_VERSION=${OPEN_JDK_KONTAIN_RELEASE_VERSION}  -t ${IMAGE_NAME}:latest .
+	docker build -t ${IMAGE_NAME}:latest .
+	# docker build -f Dockerfile.multistep-example -t ${IMAGE_NAME} .
 	docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:1.0
+
+run:
+	mvn spring-boot:run
 
 jib-build:
 	echo
